@@ -1,119 +1,147 @@
 /// 인증 서비스
-/// TODO: 실제 API 연동 시 이 파일만 수정하면 됨
+/// REST API와 연동된 실제 인증 서비스
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ttm/constants/api_config.dart';
 import 'package:ttm/models/user.dart';
 
 class AuthService {
   static const String _keyUser = 'user';
   static const String _keyToken = 'token';
 
-  /// 더미 사용자 데이터
-  /// TODO: 실제 API로 교체 필요
-  static final List<Map<String, dynamic>> _dummyUsers = [
-    {
-      'id': '1',
-      'username': 'test',
-      'password': '1234',
-      'email': 'test@test.com',
-      'name': '테스트 사용자',
-    },
-    {
-      'id': '2',
-      'username': 'admin',
-      'password': 'admin',
-      'email': 'admin@ttm.com',
-      'name': '관리자',
-    },
-  ];
-
   /// 회원가입
-  /// TODO: 실제 API 호출로 교체
   /// POST /api/auth/signup
   Future<User?> signup({
-    required String username,
-    required String password,
+    required String loginId,
+    required String nickname,
     required String email,
+    required String password,
     required String name,
+    String? phone,
+    String? birthdate,
+    String? gender,
   }) async {
     try {
-      // TODO: 실제 API 호출
-      // final response = await http.post(
-      //   Uri.parse('$baseUrl/api/auth/signup'),
-      //   body: {'username': username, 'password': password, 'email': email, 'name': name},
-      // );
+      final response = await http.post(
+        Uri.parse(ApiConfig.getUrl(ApiConfig.signupEndpoint)),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'login_id': loginId,
+          'nickname': nickname,
+          'email': email,
+          'password': password,
+          'member_name': name,
+          if (phone != null) 'phone_number': phone,
+          if (birthdate != null) 'birth_date': birthdate,
+          if (gender != null) 'gender': gender,
+        }),
+      ).timeout(ApiConfig.timeout);
 
-      // 더미 데이터 중복 체크
-      await Future.delayed(const Duration(milliseconds: 500)); // API 호출 시뮬레이션
-
-      final existingUser = _dummyUsers.where((user) => user['username'] == username).toList();
-      
-      if (existingUser.isNotEmpty) {
-        return null; // 이미 존재하는 아이디
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final user = User.fromJson(data['user']);
+        return user;
+      } else if (response.statusCode == 409) {
+        // 이미 존재하는 아이디/닉네임/이메일
+        return null;
+      } else {
+        print('회원가입 실패: ${response.statusCode} - ${response.body}');
+        return null;
       }
-
-      // 새 사용자 추가
-      final newUser = {
-        'id': (_dummyUsers.length + 1).toString(),
-        'username': username,
-        'password': password,
-        'email': email,
-        'name': name,
-      };
-      
-      _dummyUsers.add(newUser);
-
-      // User 객체 생성 (회원가입 후 자동 로그인 안 함)
-      final user = User(
-        id: newUser['id'] as String,
-        username: newUser['username'] as String,
-        email: newUser['email'] as String,
-        name: newUser['name'] as String?,
-      );
-
-      return user;
     } catch (e) {
       print('회원가입 오류: $e');
       return null;
     }
   }
 
-  /// 로그인
-  /// TODO: 실제 API 호출로 교체
-  /// POST /api/auth/login
-  Future<User?> login(String username, String password) async {
+  /// 아이디 중복 확인
+  /// GET /api/auth/check-login-id/{login_id}
+  Future<bool> checkLoginIdDuplicate(String loginId) async {
     try {
-      // TODO: 실제 API 호출
-      // final response = await http.post(
-      //   Uri.parse('$baseUrl/api/auth/login'),
-      //   body: {'username': username, 'password': password},
-      // );
+      final response = await http.get(
+        Uri.parse(ApiConfig.getUrl('/check-login-id/$loginId')),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(ApiConfig.timeout);
 
-      // 더미 데이터 검증
-      await Future.delayed(const Duration(milliseconds: 500)); // API 호출 시뮬레이션
-
-      final userData = _dummyUsers.firstWhere(
-        (user) => user['username'] == username && user['password'] == password,
-        orElse: () => {},
-      );
-
-      if (userData.isEmpty) {
-        return null; // 로그인 실패
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return !(data['available'] as bool); // available이 false면 중복
       }
+      return false;
+    } catch (e) {
+      print('아이디 중복 확인 오류: $e');
+      return false;
+    }
+  }
 
-      // User 객체 생성
-      final user = User(
-        id: userData['id'] as String,
-        username: userData['username'] as String,
-        email: userData['email'] as String,
-        name: userData['name'] as String?,
-      );
+  /// 닉네임 중복 확인
+  /// GET /api/auth/check-nickname/{nickname}
+  Future<bool> checkNicknameDuplicate(String nickname) async {
+    try {
+      final response = await http.get(
+        Uri.parse(ApiConfig.getUrl('/check-nickname/$nickname')),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(ApiConfig.timeout);
 
-      // 로컬에 저장
-      await _saveUser(user);
-      await _saveToken('dummy_token_${user.id}'); // 더미 토큰
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return !(data['available'] as bool); // available이 false면 중복
+      }
+      return false;
+    } catch (e) {
+      print('닉네임 중복 확인 오류: $e');
+      return false;
+    }
+  }
 
-      return user;
+  /// 이메일 중복 확인
+  /// GET /api/auth/check-email/{email}
+  Future<bool> checkEmailDuplicate(String email) async {
+    try {
+      final response = await http.get(
+        Uri.parse(ApiConfig.getUrl('/check-email/$email')),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(ApiConfig.timeout);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return !(data['available'] as bool); // available이 false면 중복
+      }
+      return false;
+    } catch (e) {
+      print('이메일 중복 확인 오류: $e');
+      return false;
+    }
+  }
+
+  /// 로그인
+  /// POST /api/auth/login
+  Future<User?> login(String loginId, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConfig.getUrl(ApiConfig.loginEndpoint)),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'login_id': loginId,
+          'password': password,
+        }),
+      ).timeout(ApiConfig.timeout);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final user = User.fromJson(data['user']);
+        final token = data['token'] as String;
+
+        // 로컬에 저장
+        await _saveUser(user);
+        await _saveToken(token);
+
+        return user;
+      } else {
+        print('로그인 실패: ${response.statusCode} - ${response.body}');
+        return null;
+      }
     } catch (e) {
       print('로그인 오류: $e');
       return null;
@@ -129,7 +157,8 @@ class AuthService {
     
     final user = User(
       id: '100',
-      username: 'kakao_user',
+      loginId: 'kakao_user',
+      nickname: '카카오사용자',
       email: 'kakao@example.com',
       name: '카카오 사용자',
     );
@@ -148,7 +177,8 @@ class AuthService {
     
     final user = User(
       id: '200',
-      username: 'naver_user',
+      loginId: 'naver_user',
+      nickname: '네이버사용자',
       email: 'naver@example.com',
       name: '네이버 사용자',
     );
@@ -167,7 +197,8 @@ class AuthService {
     
     final user = User(
       id: '300',
-      username: 'google_user',
+      loginId: 'google_user',
+      nickname: '구글사용자',
       email: 'google@example.com',
       name: '구글 사용자',
     );

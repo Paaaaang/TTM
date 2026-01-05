@@ -21,8 +21,21 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    # 경고 무시 설정
+    avoid_print: false  # print 사용 허용
+    prefer_const_constructors: false  # const 생성자 경고 무시
+    prefer_const_literals_to_create_immutables: false  # const 리터럴 경고 무시
+    use_key_in_widget_constructors: false  # Key 필수 경고 무시
+    constant_identifier_names: false  # 상수 네이밍 경고 무시
+    non_constant_identifier_names: false  # 변수 네이밍 경고 무시
+
+analyzer:
+  errors:
+    # 경고를 info 수준으로 낮춤 (노란색 밑줄 제거)
+    unused_import: ignore
+    unused_local_variable: ignore
+    unused_element: ignore
+    dead_code: ignore
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

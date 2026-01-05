@@ -1,6 +1,6 @@
 /// 온보딩 화면
 /// 스크린샷 디자인을 Flutter로 구현
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';                                                                             
 
 /// 온보딩(환영) 화면 위젯
 /// 사용자 닉네임과 함께 앱 시작 안내 표시
@@ -28,22 +28,39 @@ class OnboardingScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: Column(
               children: [
-                const SizedBox(height: 60),
+                const SizedBox(height: 120),
                 
                 // 로고
                 Image.asset(
                   'assets/icons/logoIcon.png',
-                  width: 400,
-                  height: 400,
+                  width: 200,
+                  height: 200,
                   fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF66BB6A),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: const Icon(
+                        Icons.energy_savings_leaf,
+                        size: 100,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
                 ),
                 
+                const SizedBox(height: 40),
 
                 // 부제목
                 const Text(
                   '나를 위한 스마트한 변화',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontFamily: 'BMJUA',
+                    fontSize: 24,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF424242),
                   ),
@@ -70,7 +87,7 @@ class OnboardingScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // TODO: 로그인 화면으로 이동
-                      Navigator.pushReplacementNamed(context, '/login');
+                      Navigator.pushNamed(context, '/login');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF66BB6A),
@@ -78,6 +95,7 @@ class OnboardingScreen extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      overlayColor: const Color(0xFF5CB860),
                     ),
                     child: const Text(
                       '로그인',
@@ -108,6 +126,7 @@ class OnboardingScreen extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      overlayColor: const Color(0xFF66BB6A).withOpacity(0.1),
                     ),
                     child: const Text(
                       '회원가입',
@@ -120,7 +139,7 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                 ),
                 
-                const SizedBox(height: 40),
+                const SizedBox(height: 120),
               ],
             ),
           ),

@@ -61,6 +61,12 @@ dependencies:
   flutter_svg: ^2.0.10+1
   google_fonts: ^6.2.1  # Pretendard 폰트 포함
   fl_chart: ^0.70.1
+  font_awesome_flutter: ^10.7.0
+  
+  # 소셜 로그인
+  kakao_flutter_sdk: ^1.9.6  # 카카오 로그인
+  flutter_naver_login: ^1.8.0  # 네이버 로그인
+  google_sign_in: ^6.2.1  # 구글 로그인
 
 dev_dependencies:
   flutter_test:
@@ -105,3 +111,6 @@ flutter:
           weight: 600
         - asset: assets/fonts/Pretendard-Bold.ttf
           weight: 700
+    - family: BMJUA
+      fonts:
+        - asset: assets/fonts/BMJUA.ttf

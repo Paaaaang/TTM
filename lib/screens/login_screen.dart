@@ -1,6 +1,7 @@
 /// 로그인 화면
 /// Login.tsx를 참고하여 Flutter로 변환 (실제 로그인 폼)
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ttm/constants/app_colors.dart';
 import 'package:ttm/services/auth_service.dart';
 
@@ -91,9 +92,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 아이디 입력
+                    // 아이디 또는 이메일 입력
                     const Text(
-                      '아이디',
+                      '아이디 또는 이메일',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -104,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       controller: _usernameController,
                       decoration: InputDecoration(
-                        hintText: '아이디',
+                        hintText: '아이디 또는 이메일을 입력해주세요',
                         filled: true,
                         fillColor: Colors.grey[50],
                         border: OutlineInputBorder(
@@ -157,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _showPassword ? Icons.visibility_off : Icons.visibility,
+                            _showPassword ? Icons.visibility : Icons.visibility_off,
                             color: Colors.grey[600],
                           ),
                           onPressed: () {
@@ -239,17 +240,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: Colors.black87,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
+                            const FaIcon(
+                              FontAwesomeIcons.commentDots,
+                              size: 20,
+                              color: Colors.black87,
                             ),
                             const SizedBox(width: 8),
                             const Text(
-                              '카카오로 로그인',
+                              '카카오로 시작하기',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -284,7 +282,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 20,
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(2),
                               ),
                               child: const Center(
                                 child: Text(
@@ -299,7 +297,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(width: 8),
                             const Text(
-                              '네이버로 로그인',
+                              '네이버로 시작하기',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -329,28 +327,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  'G',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFF4285F4),
-                                  ),
-                                ),
-                              ),
+                            const FaIcon(
+                              FontAwesomeIcons.google,
+                              size: 20,
+                              color: Color(0xFF4285F4),
                             ),
                             const SizedBox(width: 8),
                             const Text(
-                              '구글로 로그인',
+                              '구글로 시작하기',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -421,7 +405,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('아이디와 비밀번호를 입력해주세요')),
+        const SnackBar(content: Text('이메일과 비밀번호를 입력해주세요')),
       );
       return;
     }
@@ -435,12 +419,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user.name ?? user.username}님 환영합니다!')),
+          SnackBar(content: Text('${user.name ?? user.email}님 환영합니다!')),
         );
-        Navigator.pushReplacementNamed(context, '/main');
+        Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('아이디 또는 비밀번호가 일치하지 않습니다')),
+          const SnackBar(content: Text('이메일 또는 비밀번호가 일치하지 않습니다')),
         );
       }
     } catch (e) {
@@ -466,9 +450,9 @@ class _LoginScreenState extends State<LoginScreen> {
       
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user.name ?? user.username}님 환영합니다!')),
+          SnackBar(content: Text('${user.name ?? user.email}님 환영합니다!')),
         );
-        Navigator.pushReplacementNamed(context, '/main');
+        Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       }
     } catch (e) {
       if (!mounted) return;
@@ -493,9 +477,9 @@ class _LoginScreenState extends State<LoginScreen> {
       
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user.name ?? user.username}님 환영합니다!')),
+          SnackBar(content: Text('${user.name ?? user.email}님 환영합니다!')),
         );
-        Navigator.pushReplacementNamed(context, '/main');
+        Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       }
     } catch (e) {
       if (!mounted) return;
@@ -520,9 +504,9 @@ class _LoginScreenState extends State<LoginScreen> {
       
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user.name ?? user.username}님 환영합니다!')),
+          SnackBar(content: Text('${user.name ?? user.email}님 환영합니다!')),
         );
-        Navigator.pushReplacementNamed(context, '/main');
+        Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       }
     } catch (e) {
       if (!mounted) return;
