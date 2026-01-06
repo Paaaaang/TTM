@@ -26,6 +26,7 @@ class SignupRequest(BaseModel):
     phone_number: str | None = None
     birth_date: str | None = None  # YYYY-MM-DD 형식
     gender: str | None = None  # 'M' or 'F'
+    region: str = '서울'  # 기본값
 
     @validator('login_id')
     def login_id_length(cls, v):
@@ -43,6 +44,8 @@ class SignupRequest(BaseModel):
     def password_strength(cls, v):
         if len(v) < 10:
             raise ValueError('비밀번호는 최소 10자 이상이어야 합니다')
+        if len(v) > 50:
+            raise ValueError('비밀번호는 최대 50자까지 입력 가능합니다')
         if not any(c.isupper() for c in v):
             raise ValueError('비밀번호는 대문자를 포함해야 합니다')
         if not any(c.islower() for c in v):
@@ -122,16 +125,18 @@ async def signup(request: SignupRequest):
                 detail="이미 존재하는 이메일입니다"
             )
 
-        # 비밀번호 해싱
-        hashed_password = pwd_context.hash(request.password)
+        # 비밀번호 해싱 (bcrypt는 72바이트까지만 처리 가능)
+        password_bytes = request.password.encode('utf-8')[:72]
+        password_truncated = password_bytes.decode('utf-8', errors='ignore')
+        hashed_password = pwd_context.hash(password_truncated)
 
         # 사용자 생성
         cursor.execute(
             """INSERT INTO members (login_id, nickname, email, password_hash, member_name, 
-                                    phone_number, birth_date, gender, member_status, created_at, terms_agreed) 
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'ACTIVE', NOW(), 1)""",
+                                    phone_number, birth_date, gender, region, member_status, created_at, terms_agreed) 
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'ACTIVE', NOW(), 1)""",
             (request.login_id, request.nickname, request.email, hashed_password, request.member_name,
-             request.phone_number, request.birth_date, request.gender)
+             request.phone_number, request.birth_date, request.gender, request.region)
         )
         conn.commit()
         member_id = cursor.lastrowid
@@ -189,8 +194,10 @@ async def login(request: LoginRequest):
                 detail="아이디 또는 비밀번호가 일치하지 않습니다"
             )
 
-        # 비밀번호 검증
-        if not pwd_context.verify(request.password, user['password_hash']):
+        # 비밀번호 검증 (bcrypt는 72바이트까지만 처리 가능)
+        password_bytes = request.password.encode('utf-8')[:72]
+        password_truncated = password_bytes.decode('utf-8', errors='ignore')
+        if not pwd_context.verify(password_truncated, user['password_hash']):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="아이디 또는 비밀번호가 일치하지 않습니다"
@@ -246,6 +253,21 @@ async def logout():
 @router.get("/check-login-id/{login_id}")
 async def check_login_id(login_id: str):
     """아이디 중복 확인"""
+    import re
+    
+    # 형식 검증
+    if len(login_id) < 3:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="아이디는 최소 3자 이상이어야 합니다"
+        )
+    
+    if not re.match(r'^[a-zA-Z0-9_-]+$', login_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="아이디는 영문, 숫자, 하이픈(-), 언더스코어(_)만 사용 가능합니다"
+        )
+    
     conn = None
     cursor = None
     
@@ -278,6 +300,13 @@ async def check_login_id(login_id: str):
 @router.get("/check-nickname/{nickname}")
 async def check_nickname(nickname: str):
     """닉네임 중복 확인"""
+    # 형식 검증
+    if len(nickname) < 2:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="닉네임은 최소 2자 이상이어야 합니다"
+        )
+    
     conn = None
     cursor = None
     

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth
+from routers import auth, members, meals, exercises, posts, badges, health
 import uvicorn
 
 app = FastAPI(
@@ -20,6 +20,12 @@ app.add_middleware(
 
 # 라우터 등록
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(members.router, prefix="/api/members", tags=["members"])
+app.include_router(meals.router, tags=["meals"])  # prefix는 router 내부에 정의됨
+app.include_router(exercises.router, tags=["exercises"])  # prefix는 router 내부에 정의됨
+app.include_router(posts.router, tags=["posts"])  # prefix는 router 내부에 정의됨
+app.include_router(badges.router, tags=["badges"])  # prefix는 router 내부에 정의됨
+app.include_router(health.router, tags=["health"])  # prefix는 router 내부에 정의됨
 
 @app.get("/")
 async def root():

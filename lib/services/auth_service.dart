@@ -1,5 +1,9 @@
 /// 인증 서비스
+/// 
 /// REST API와 연동된 실제 인증 서비스
+/// - 회원가입, 로그인, 로그아웃 기능 제공
+/// - JWT 토큰 기반 인증
+/// - SharedPreferences를 통한 로컬 사용자 정보 저장
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +25,7 @@ class AuthService {
     String? phone,
     String? birthdate,
     String? gender,
+    String region = '서울',
   }) async {
     try {
       final response = await http.post(
@@ -32,6 +37,7 @@ class AuthService {
           'email': email,
           'password': password,
           'member_name': name,
+          'region': region,
           if (phone != null) 'phone_number': phone,
           if (birthdate != null) 'birth_date': birthdate,
           if (gender != null) 'gender': gender,
@@ -44,6 +50,8 @@ class AuthService {
         return user;
       } else if (response.statusCode == 409) {
         // 이미 존재하는 아이디/닉네임/이메일
+        final errorData = jsonDecode(response.body) as Map<String, dynamic>;
+        print('회원가입 409 에러: ${errorData['detail']}');
         return null;
       } else {
         print('회원가입 실패: ${response.statusCode} - ${response.body}');
@@ -60,7 +68,7 @@ class AuthService {
   Future<bool> checkLoginIdDuplicate(String loginId) async {
     try {
       final response = await http.get(
-        Uri.parse(ApiConfig.getUrl('/check-login-id/$loginId')),
+        Uri.parse(ApiConfig.getUrl('/api/auth/check-login-id/$loginId')),
         headers: {'Content-Type': 'application/json'},
       ).timeout(ApiConfig.timeout);
 
@@ -80,7 +88,7 @@ class AuthService {
   Future<bool> checkNicknameDuplicate(String nickname) async {
     try {
       final response = await http.get(
-        Uri.parse(ApiConfig.getUrl('/check-nickname/$nickname')),
+        Uri.parse(ApiConfig.getUrl('/api/auth/check-nickname/$nickname')),
         headers: {'Content-Type': 'application/json'},
       ).timeout(ApiConfig.timeout);
 
@@ -100,7 +108,7 @@ class AuthService {
   Future<bool> checkEmailDuplicate(String email) async {
     try {
       final response = await http.get(
-        Uri.parse(ApiConfig.getUrl('/check-email/$email')),
+        Uri.parse(ApiConfig.getUrl('/api/auth/check-email/$email')),
         headers: {'Content-Type': 'application/json'},
       ).timeout(ApiConfig.timeout);
 
@@ -156,11 +164,13 @@ class AuthService {
     await Future.delayed(const Duration(milliseconds: 500));
     
     final user = User(
-      id: '100',
+      memberId: 100,
       loginId: 'kakao_user',
       nickname: '카카오사용자',
       email: 'kakao@example.com',
-      name: '카카오 사용자',
+      memberName: '카카오 사용자',
+      phoneNumber: '',
+      birthDate: '1990-01-01',
     );
 
     await _saveUser(user);
@@ -176,11 +186,13 @@ class AuthService {
     await Future.delayed(const Duration(milliseconds: 500));
     
     final user = User(
-      id: '200',
+      memberId: 200,
       loginId: 'naver_user',
       nickname: '네이버사용자',
       email: 'naver@example.com',
-      name: '네이버 사용자',
+      memberName: '네이버 사용자',
+      phoneNumber: '',
+      birthDate: '1990-01-01',
     );
 
     await _saveUser(user);
@@ -196,11 +208,13 @@ class AuthService {
     await Future.delayed(const Duration(milliseconds: 500));
     
     final user = User(
-      id: '300',
+      memberId: 300,
       loginId: 'google_user',
       nickname: '구글사용자',
       email: 'google@example.com',
-      name: '구글 사용자',
+      memberName: '구글 사용자',
+      phoneNumber: '',
+      birthDate: '1990-01-01',
     );
 
     await _saveUser(user);

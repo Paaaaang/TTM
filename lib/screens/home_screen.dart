@@ -1,13 +1,20 @@
-/// 홈 화면 - 식단/운동/커뮤니티 탭과 칼로리 트래커
-/// MainScreen.tsx의 홈 탭 콘텐츠를 Flutter로 변환
+// 홈 화면 - 식단/운동/커뮤니티 탭과 칼로리 트래커
+// MainScreen.tsx의 홈 탭 콘텐츠를 Flutter로 변환
 import 'package:flutter/material.dart';
 import 'package:ttm/constants/app_colors.dart';
 import 'package:ttm/screens/calorie_detail_popup.dart';
-
-/// 홈 화면 위젯
-/// 상단: 칼로리 트래커
-/// 중단: 식단/운동/커뮤니티 탭
-/// 하단: 각 탭의 콘텐츠
+import 'package:ttm/services/auth_service.dart';
+import 'package:ttm/services/meal_service.dart';
+import 'package:ttm/services/exercise_service.dart';
+import 'package:ttm/services/post_service.dart';
+import 'package:ttm/models/user.dart';
+import 'package:ttm/models/meal_log.dart';
+import 'package:ttm/models/exercise_log.dart';
+import 'package:ttm/models/post.dart';
+// 홈 화면 위젯
+// 상단: 칼로리 트래커
+// 중단: 식단/운동/커뮤니티 탭
+// 하단: 각 탭의 콘텐츠
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -16,68 +23,157 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  /// 스크롤 컨트롤러
+  // 스크롤 컨트롤러
   final ScrollController _scrollController = ScrollController();
   
-  /// 현재 활성화된 탭 (0: 식단, 1: 운동, 2: 커뮤니티)
-  int _currentTab = 0;
+  // 현재 활성화된 탭 (0: 식단, 1: 운동, 2: 커뮤니티)
+  int _currentTab = 0;  
+  /// 인증 서비스
+  final AuthService _authService = AuthService();
   
-  /// 각 섹션의 GlobalKey
+  /// 식단 서비스
+  final MealService _mealService = MealService();
+  
+  /// 운동 서비스
+  final ExerciseService _exerciseService = ExerciseService();
+  
+  /// 커뮤니티 서비스
+  final PostService _postService = PostService();
+  
+  /// 현재 사용자 정보
+  User? _currentUser;
+  
+  /// 오늘의 식단 데이터 (DB에서 로드)
+  List<MealLog> _todayMeals = [];
+  
+  /// 오늘의 운동 데이터 (DB에서 로드)
+  List<ExerciseLog> _todayExercises = [];
+  
+  /// 커뮤니티 게시글 데이터 (DB에서 로드)
+  List<PostListItem> _todayCommunityPosts = [];
+  
+  /// 로딩 상태
+  bool _isLoadingMeals = false;
+  bool _isLoadingExercises = false;
+  bool _isLoadingCommunityPosts = false;
+  
   final GlobalKey _dietKey = GlobalKey();
   final GlobalKey _exerciseKey = GlobalKey();
   final GlobalKey _communityKey = GlobalKey();
-  
-  /// 더미 데이터: 식단 (아침/점심/저녁/간식)
-  final Map<String, List<Map<String, dynamic>>> _mealData = {
-    'breakfast': [],
-    'lunch': [],
-    'dinner': [],
-    'snack': [],
-  };
-  
-  /// 단식 상태 관리 (각 식사별)
-  final Map<String, bool> _fastingState = {
-    'breakfast': false,
-    'lunch': false,
-    'dinner': false,
-    'snack': false,
-  };
-
-  /// 더미 데이터: 운동
-  final List<Map<String, dynamic>> _exerciseData = [];
-
-  /// 더미 데이터: 커뮤니티 게시글
-  final List<Map<String, dynamic>> _communityPosts = [
-    {
-      'id': 1,
-      'author': '건강러버',
-      'time': '2시간 전',
-      'content': '오늘 처음으로 5km 달리기 성공했어요! 너무 뿌듯해요 💪',
-      'likes': 24,
-      'comments': 8,
-    },
-    {
-      'id': 2,
-      'author': '다이어터',
-      'time': '5시간 전',
-      'content': '한 달간의 식단 관리 결과 -3kg 성공! 여러분도 할 수 있어요!',
-      'likes': 42,
-      'comments': 15,
-    },
-    {
-      'id': 3,
-      'author': '요가마스터',
-      'time': '1일 전',
-      'content': '아침 요가 30분 루틴 공유합니다. 하루를 상쾌하게 시작하세요 🧘‍♀️',
-      'likes': 38,
-      'comments': 12,
-    },
-  ];
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _loadUserInfo();
+    _loadTodayMeals();
+    _loadTodayExercises();
+    _loadTodayCommunityPosts();
+  }
+  
+  /// 사용자 정보 로드
+  Future<void> _loadUserInfo() async {
+    final user = await _authService.getCurrentUser();
+    if (mounted) {
+      setState(() {
+        _currentUser = user;
+      });
+    }
+  }
+  
+  /// 오늘의 식단 데이터 로드
+  Future<void> _loadTodayMeals() async {
+    if (_currentUser == null) {
+      // 사용자 정보가 없으면 먼저 로드
+      await _loadUserInfo();
+    }
+    
+    if (_currentUser == null) {
+      return; // 여전히 사용자 정보가 없으면 리턴
+    }
+    
+    setState(() {
+      _isLoadingMeals = true;
+    });
+    
+    try {
+      final meals = await _mealService.getTodayMeals(_currentUser!.memberId);
+      if (mounted) {
+        setState(() {
+          _todayMeals = meals;
+          _isLoadingMeals = false;
+        });
+      }
+    } catch (e) {
+      print('오늘 식단 로드 오류: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingMeals = false;
+        });
+      }
+    }
+  }
+
+  /// 오늘의 운동 데이터 로드
+  Future<void> _loadTodayExercises() async {
+    if (_currentUser == null) {
+      // 사용자 정보가 없으면 먼저 로드
+      await _loadUserInfo();
+    }
+    
+    if (_currentUser == null) {
+      return; // 여전히 사용자 정보가 없으면 리턴
+    }
+    
+    setState(() {
+      _isLoadingExercises = true;
+    });
+    
+    try {
+      final exercises = await _exerciseService.getTodayExercises(_currentUser!.memberId);
+      if (mounted) {
+        setState(() {
+          _todayExercises = exercises;
+          _isLoadingExercises = false;
+        });
+      }
+    } catch (e) {
+      print('오늘 운동 로드 오류: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingExercises = false;
+        });
+      }
+    }
+  }
+
+  /// 커뮤니티 게시글 데이터 로드 (최신 10개)
+  Future<void> _loadTodayCommunityPosts() async {
+    setState(() {
+      _isLoadingCommunityPosts = true;
+    });
+    
+    try {
+      // 전체 카테고리, 최신 10개 게시물 조회
+      final posts = await _postService.getPostsList(
+        page: 1,
+        limit: 10,
+        category: null, // 전체 카테고리
+      );
+      if (mounted) {
+        setState(() {
+          _todayCommunityPosts = posts;
+          _isLoadingCommunityPosts = false;
+        });
+      }
+    } catch (e) {
+      print('커뮤니티 게시글 로드 오류: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingCommunityPosts = false;
+        });
+      }
+    }
   }
 
   @override
@@ -86,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  /// 스크롤 리스너 - 현재 보이는 섹션 추적
+  // 스크롤 리스너 - 현재 보이는 섹션 추적
   void _onScroll() {
     final dietPosition = _getWidgetPosition(_dietKey);
     final exercisePosition = _getWidgetPosition(_exerciseKey);
@@ -102,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  /// 위젯의 화면 내 위치 가져오기
+  // 위젯의 화면 내 위치 가져오기
   double? _getWidgetPosition(GlobalKey key) {
     final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return null;
@@ -110,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return position.dy;
   }
 
-  /// 특정 섹션으로 스크롤
+  // 특정 섹션으로 스크롤
   void _scrollToSection(int index) {
     GlobalKey? targetKey;
     switch (index) {
@@ -136,28 +232,27 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  /// 식단 칼로리 계산
+  // 식단 칼로리 계산 (특정 식사 유형)
   int _calculateMealCalories(String mealType) {
-    return _mealData[mealType]?.fold<int>(0, (sum, meal) => sum + (meal['calories'] as int? ?? 0)) ?? 0;
+    return _todayMeals
+        .where((meal) => meal.mealType == mealType)
+        .fold<int>(0, (sum, meal) => sum + meal.totalCalories.toInt());
   }
 
-  /// 총 칼로리 계산
+  // 총 칼로리 계산
   int get _totalCalories {
-    return _calculateMealCalories('breakfast') +
-        _calculateMealCalories('lunch') +
-        _calculateMealCalories('dinner') +
-        _calculateMealCalories('snack');
+    return _todayMeals.fold<int>(0, (sum, meal) => sum + meal.totalCalories.toInt());
   }
 
-  /// 운동 소모 칼로리 계산
+  // 운동 소모 칼로리 계산
   int get _totalExerciseCalories {
-    return _exerciseData.fold(0, (sum, ex) => sum + (ex['calories'] as int? ?? 0));
+    return _todayExercises.fold<int>(0, (sum, ex) => sum + (ex.caloriesBurned?.toInt() ?? 0));
   }
 
-  /// 순 칼로리 (섭취 - 소모)
+  // 순 칼로리 (섭취 - 소모)
   int get _netCalories => _totalCalories - _totalExerciseCalories;
 
-  /// 목표 칼로리
+  // 목표 칼로리
   final int _targetCalories = 2000;
 
   @override
@@ -192,10 +287,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 상단 헤더 빌드 (칼로리 트래커)
+  // 상단 헤더 빌드 (칼로리 트래커)
   Widget _buildHeader() {
-    // TODO: 실제로는 사용자 정보에서 닉네임을 가져와야 함
-    const String userNickname = '사용자';
+    final String userNickname = _currentUser?.nickname ?? '사용자';
     final double progressPercent = (_netCalories / _targetCalories).clamp(0.0, 1.0);
 
     return Container(
@@ -305,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 고정 탭 바 빌드
+  // 고정 탭 바 빌드
   Widget _buildFixedTabBar() {
     return Container(
       color: Colors.white,
@@ -321,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 탭 버튼 빌드
+  // 탭 버튼 빌드
   Widget _buildTabButton(String title, IconData icon, int index) {
     final isActive = _currentTab == index;
     return Expanded(
@@ -361,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 섹션 빌드
+  // 섹션 빌드
   Widget _buildSection(String title, Widget content, GlobalKey key) {
     return Container(
       key: key,
@@ -406,7 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 식단 콘텐츠 빌드 (2x2 그리드)
+  // 식단 콘텐츠 빌드 (2x2 그리드)
   Widget _buildDietContent() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -427,22 +521,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 식사 카드 빌드 (개선된 버전)
+  // 식사 카드 빌드 (DB 연동 버전)
   Widget _buildMealCard(String type, String title, String emoji) {
-    final meals = _mealData[type] ?? [];
+    // 해당 식사 유형의 식단 필터링
+    final mealLogs = _todayMeals.where((meal) => meal.mealType == type).toList();
     final totalCalories = _calculateMealCalories(type);
-    final hasMeal = meals.isNotEmpty; // 식단이 추가되었는지 확인
-    final hasImage = meals.isNotEmpty && meals.first['image'] != null;
-    final isFasting = _fastingState[type] ?? false;
+    final hasMeal = mealLogs.isNotEmpty;
 
     return GestureDetector(
       onTap: () async {
+        // TODO: 식단 추가/수정 화면으로 이동
         final result = await Navigator.pushNamed(context, '/meal/camera');
         if (result != null && result is Map<String, dynamic>) {
-          setState(() {
-            _mealData[type] = [result];
-            _fastingState[type] = false; // 식단 추가 시 단식 해제
-          });
+          // 식단 추가 후 새로고침
+          await _loadTodayMeals();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -501,12 +593,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   // + 버튼
                   InkWell(
                     onTap: () async {
+                      // TODO: 식단 추가 화면
                       final result = await Navigator.pushNamed(context, '/meal/camera');
-                      if (result != null && result is Map<String, dynamic>) {
-                        setState(() {
-                          _mealData[type] = [result];
-                          _fastingState[type] = false;
-                        });
+                      if (result != null) {
+                        await _loadTodayMeals();
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -544,48 +634,69 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // 이미지 또는 플레이스홀더
-                    Expanded(
-                      child: hasImage
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                meals.first['image'] ?? '',
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      Icons.restaurant_menu,
-                                      color: Colors.grey[300],
-                                      size: 32,
+                    // 로딩 또는 데이터 표시
+                    if (_isLoadingMeals)
+                      const Center(child: CircularProgressIndicator())
+                    else if (hasMeal)
+                      // 식단이 있으면 음식 목록 표시
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 음식 항목들
+                            Expanded(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: mealLogs.first.items.length > 3 ? 3 : mealLogs.first.items.length,
+                                itemBuilder: (context, index) {
+                                  final item = mealLogs.first.items[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 4),
+                                    child: Text(
+                                      '• ${item.foodName}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[700],
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   );
                                 },
                               ),
-                            )
-                          : Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[50],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.restaurant_menu,
-                                color: Colors.grey[300],
-                                size: 36,
-                              ),
                             ),
-                    ),
+                            if (mealLogs.first.items.length > 3)
+                              Text(
+                                '외 ${mealLogs.first.items.length - 3}개',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                          ],
+                        ),
+                      )
+                    else
+                      // 식단이 없으면 플레이스홀더
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[50],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.restaurant_menu,
+                            color: Colors.grey[300],
+                            size: 36,
+                          ),
+                        ),
+                      ),
                     
                     const SizedBox(height: 8),
                     
-                    // 하단: 칼로리 또는 단식 체크 버튼
+                    // 하단: 칼로리 표시
                     if (hasMeal)
-                      // 식단이 추가되면 총 열량 표시
                       Text(
                         '$totalCalories kcal',
                         style: const TextStyle(
@@ -595,37 +706,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       )
                     else
-                      // 식단이 없으면 단식 체크 버튼
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _fastingState[type] = !(_fastingState[type] ?? false);
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '단식',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: isFasting
-                                      ? const Color(0xFF1DB954)
-                                      : Colors.grey[600],
-                                ),
-                              ),
-                              Icon(
-                                Icons.check,
-                                size: 18,
-                                color: isFasting
-                                    ? const Color(0xFF1DB954)
-                                    : Colors.grey[400],
-                              ),
-                            ],
-                          ),
+                      Text(
+                        '식단 추가',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[500],
                         ),
                       ),
                   ],
@@ -638,7 +723,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 운동 콘텐츠 빌드
+  // 운동 콘텐츠 빌드 (DB 연동 버전)
   Widget _buildExerciseContent() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -660,8 +745,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 16),
+          
+          // 로딩 중
+          if (_isLoadingExercises)
+            const Center(child: CircularProgressIndicator())
+          
           // 운동 기록이 없을 때
-          if (_exerciseData.isEmpty)
+          else if (_todayExercises.isEmpty)
             GestureDetector(
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -703,10 +793,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-            ),
-          // 운동 기록이 있을 때
-          if (_exerciseData.isNotEmpty) ...[
-            ..._exerciseData.map((exercise) {
+            )
+          
+          // 운동 기록이 있을 때 (DB 데이터)
+          else ...[
+            ..._todayExercises.map((exercise) {
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
@@ -725,7 +816,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              exercise['name'] ?? '',
+                              exercise.exerciseName,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -733,7 +824,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              exercise['duration'] ?? '',
+                              exercise.durationFormatted,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -742,57 +833,38 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         Text(
-                          exercise['time'] ?? '',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[500],
+                          exercise.caloriesFormatted,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFFF6B6B),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '-${exercise['calories']} kcal',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.blue,
+                    if (exercise.memo != null && exercise.memo!.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        exercise.memo!,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
+                    ],
                   ],
                 ),
               );
             }).toList(),
-            const SizedBox(height: 8),
-            // 운동 추가 버튼
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('운동 기록 추가 화면은 준비중입니다')),
-                  );
-                },
-                icon: const Icon(Icons.add, size: 20),
-                label: const Text('운동 추가'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-              ),
-            ),
           ],
         ],
       ),
     );
   }
 
-  /// 커뮤니티 콘텐츠 빌드
+  // 커뮤니티 콘텐츠 빌드
   Widget _buildCommunityContent() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -814,79 +886,151 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // 게시글 목록
-          ..._communityPosts.map((post) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey[200]!),
+          // 로딩 중
+          if (_isLoadingCommunityPosts)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: CircularProgressIndicator(),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            post['author'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            post['time'] ?? '',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Text(
-                        '👤',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    post['content'] ?? '',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black87,
-                      height: 1.5,
+            )
+          // 게시글이 없을 때
+          else if (_todayCommunityPosts.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.article_outlined,
+                      size: 48,
+                      color: Colors.grey[400],
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Icon(Icons.thumb_up_outlined, size: 16, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${post['likes']}',
-                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    const SizedBox(height: 12),
+                    Text(
+                      '아직 게시글이 없습니다',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.grey[600],
                       ),
-                      const SizedBox(width: 16),
-                      Icon(Icons.chat_bubble_outline, size: 16, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${post['comments']}',
-                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            );
-          }).toList(),
+            )
+          // 게시글 목록
+          else
+            ..._todayCommunityPosts.map((post) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  // 카테고리 뱃지
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _getCategoryColor(post.category),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      post.categoryName,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // 작성자
+                                  Flexible(
+                                    child: Text(
+                                      post.authorNickname ?? '익명',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                post.timeAgo,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // 이미지 표시 아이콘
+                        if (post.hasImages)
+                          Icon(
+                            Icons.image,
+                            size: 20,
+                            color: Colors.grey[400],
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // 제목
+                    Text(
+                      post.title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 12),
+                    // 좋아요, 조회수
+                    Row(
+                      children: [
+                        Icon(Icons.thumb_up_outlined,
+                            size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${post.likeCount}',
+                          style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                        ),
+                        const SizedBox(width: 16),
+                        Icon(Icons.visibility_outlined,
+                            size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${post.viewCount}',
+                          style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
           const SizedBox(height: 8),
           // 커뮤니티 더보기 버튼
           SizedBox(
@@ -913,5 +1057,19 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  // 카테고리별 색상 반환
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case '식단':
+        return AppColors.primary;
+      case '운동':
+        return AppColors.secondary;
+      case '자유':
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
   }
 }

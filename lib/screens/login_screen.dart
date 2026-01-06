@@ -1,12 +1,12 @@
-/// 로그인 화면
-/// Login.tsx를 참고하여 Flutter로 변환 (실제 로그인 폼)
+// 로그인 화면
+// Login.tsx를 참고하여 Flutter로 변환 (실제 로그인 폼)
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ttm/constants/app_colors.dart';
 import 'package:ttm/services/auth_service.dart';
 
-/// 로그인 화면 위젯
-/// 아이디/비밀번호 입력 및 소셜 로그인 제공
+// 로그인 화면 위젯
+// 아이디/비밀번호 입력 및 소셜 로그인 제공
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     // 아이디 또는 이메일 입력
                     const Text(
-                      '아이디 또는 이메일',
+                      '아이디',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       controller: _usernameController,
                       decoration: InputDecoration(
-                        hintText: '아이디 또는 이메일을 입력해주세요',
+                        hintText: '아이디를 입력해주세요',
                         filled: true,
                         fillColor: Colors.grey[50],
                         border: OutlineInputBorder(
@@ -424,7 +424,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('이메일 또는 비밀번호가 일치하지 않습니다')),
+          const SnackBar(content: Text('아이디 또는 비밀번호가 일치하지 않습니다')),
         );
       }
     } catch (e) {

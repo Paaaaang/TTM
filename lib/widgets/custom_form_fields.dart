@@ -1,5 +1,6 @@
 /// 공통 입력 필드 위젯
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// 텍스트 입력 필드
 class CustomTextField extends StatelessWidget {
@@ -10,7 +11,10 @@ class CustomTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final FocusNode? focusNode;
   final Function(String)? onChanged;
+  final Function(String)? onSubmitted;
   final TextAlign textAlign;
+  final List<TextInputFormatter>? inputFormatters;
+  final int? maxLength;
 
   const CustomTextField({
     Key? key,
@@ -21,7 +25,10 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType,
     this.focusNode,
     this.onChanged,
+    this.onSubmitted,
     this.textAlign = TextAlign.start,
+    this.inputFormatters,
+    this.maxLength,
   }) : super(key: key);
 
   @override
@@ -32,11 +39,15 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keyboardType,
       focusNode: focusNode,
       onChanged: onChanged,
+      onSubmitted: onSubmitted,
       textAlign: textAlign,
+      inputFormatters: inputFormatters,
+      maxLength: maxLength,
       decoration: InputDecoration(
         hintText: hintText,
         filled: true,
         fillColor: Colors.grey[50],
+        counterText: maxLength != null ? '' : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: Colors.grey[300]!),
@@ -133,6 +144,8 @@ class TextFieldWithDuplicateCheck extends StatelessWidget {
   final String? message;
   final FocusNode? focusNode;
   final Function(String)? onChanged;
+  final Function(String)? onSubmitted;
+  final List<TextInputFormatter>? inputFormatters;
 
   const TextFieldWithDuplicateCheck({
     Key? key,
@@ -145,6 +158,8 @@ class TextFieldWithDuplicateCheck extends StatelessWidget {
     this.message,
     this.focusNode,
     this.onChanged,
+    this.onSubmitted,
+    this.inputFormatters,
   }) : super(key: key);
 
   @override
@@ -160,6 +175,8 @@ class TextFieldWithDuplicateCheck extends StatelessWidget {
                 hintText: hintText,
                 focusNode: focusNode,
                 onChanged: onChanged,
+                onSubmitted: onSubmitted,
+                inputFormatters: inputFormatters,
               ),
             ),
             const SizedBox(width: 8),
