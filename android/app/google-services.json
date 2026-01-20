@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "341747234017",
+    "project_id": "ttmproject-db8bb",
+    "storage_bucket": "ttmproject-db8bb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341747234017:android:163ac80e72c6ed7e3ff3a0",
+        "android_client_info": {
+          "package_name": "com.example.ttm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCM3rIrU7RAGCZWwB7JT80N9GgSsy6nVX8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
