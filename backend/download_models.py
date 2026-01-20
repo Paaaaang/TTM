@@ -10,11 +10,11 @@ import sys
 # 모델 다운로드 URL 설정 (Google Drive 공유 링크 또는 직접 URL)
 MODEL_URLS = {
     "yolo": {
-        "url": "YOUR_GOOGLE_DRIVE_LINK_HERE",  # 667MB YOLO 모델
+        "url": "https://drive.google.com/uc?export=download&id=1yBITpY563jVUNmx_wIQvn3bJ5yj5OrDE",  # 247MB YOLO 모델
         "path": "ai_models/Food_classification/yolov3/weights/best_403food_e200b150v2.pt"
     },
     "resnet": {
-        "url": "YOUR_GOOGLE_DRIVE_LINK_HERE",  # 85MB ResNet 모델
+        "url": "https://drive.google.com/uc?export=download&id=1ROaLfNs40PyESJTBP3b2bN0p_oeg46HH",  # 85MB ResNet 모델
         "path": "ai_models/E_of_the_a_of_food/quantity_est/weights/new_opencv_ckpt_b84_e200.pth"
     }
 }
