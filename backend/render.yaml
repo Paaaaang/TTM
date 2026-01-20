@@ -5,7 +5,7 @@ services:
     plan: starter # 유료 티어 $7/월 (메모리 2GB - AI 모델 가능)
     # plan: free  # 무료 티어 (메모리 512MB - AI 모델에 부족할 수 있음)
     buildCommand: pip install -r requirements.txt
-    startCommand: bash start.sh
+    startCommand: bash start_with_models.sh  # AI 모델 자동 다운로드 포함
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
