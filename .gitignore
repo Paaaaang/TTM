@@ -71,3 +71,14 @@ android/app/build/
 build/
 *.cache.dill
 *.track.dill
+
+# Backend - One-time migration and test files
+backend/add_*.py
+backend/create_*.py
+backend/check_*.py
+backend/test_*.py
+backend/quick_test.py
+backend/*_test_*.json
+backend/*_test_*.jpg
+backend/yolov11_result_*.json
+backend/yolov11_result_*.jpg
