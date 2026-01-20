@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads (프로덕션에서는 별도 저장소 사용)
+uploads/
+!uploads/.gitkeep
+
+# AI Models (용량이 큰 모델 파일)
+ai_models/yolo/*.pt
+ai_models/resnet/*.pth
+!ai_models/.gitkeep
+
+# Firebase
+firebase-credentials.json
+firebase-adminsdk*.json
+
+# Backup
+*.bak
+*.backup
+
+# Test
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary
+tmp/
+temp/
+*.tmp

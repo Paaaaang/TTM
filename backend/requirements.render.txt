@@ -1,0 +1,37 @@
+# TTM Backend - Render 배포용
+# AI 모델 제외 버전 (메모리 절약)
+
+# ===== Web Framework =====
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+
+# ===== Database =====
+mysql-connector-python==8.2.0
+PyMySQL==1.1.0
+
+# ===== Authentication & Security =====
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+
+# ===== Data Validation =====
+pydantic>=2.5.3
+pydantic-settings>=2.1.0
+
+# ===== File Upload =====
+python-multipart==0.0.6
+
+# ===== Environment =====
+python-dotenv==1.0.0
+
+# ===== Push Notifications =====
+firebase-admin>=6.5.0
+
+# ===== Data Processing =====
+pandas>=2.0.0
+openpyxl>=3.1.0
+pillow>=10.0.0
+
+# AI 모델 (PyTorch, YOLO) 제외
+# 무료 티어 메모리 부족 방지
+# AI 분석 기능은 Mock 데이터로 대체

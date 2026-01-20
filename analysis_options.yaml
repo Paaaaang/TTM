@@ -1,0 +1,41 @@
+# This file configures the analyzer, which statically analyzes Dart code to
+# check for errors, warnings, and lints.
+#
+# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
+# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
+# invoked from the command line by running `flutter analyze`.
+
+# The following line activates a set of recommended lints for Flutter apps,
+# packages, and plugins designed to encourage good coding practices.
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  # The lint rules applied to this project can be customized in the
+  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
+  # included above or to enable additional rules. A list of all available lints
+  # and their documentation is published at https://dart.dev/lints.
+  #
+  # Instead of disabling a lint rule for the entire project in the
+  # section below, it can also be suppressed for a single line of code
+  # or a specific dart file by using the `// ignore: name_of_lint` and
+  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
+  # producing the lint.
+  rules:
+    # 경고 무시 설정
+    avoid_print: false  # print 사용 허용
+    prefer_const_constructors: false  # const 생성자 경고 무시
+    prefer_const_literals_to_create_immutables: false  # const 리터럴 경고 무시
+    use_key_in_widget_constructors: false  # Key 필수 경고 무시
+    constant_identifier_names: false  # 상수 네이밍 경고 무시
+    non_constant_identifier_names: false  # 변수 네이밍 경고 무시
+
+analyzer:
+  errors:
+    # 경고를 info 수준으로 낮춤 (노란색 밑줄 제거)
+    unused_import: ignore
+    unused_local_variable: ignore
+    unused_element: ignore
+    dead_code: ignore
+
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options
