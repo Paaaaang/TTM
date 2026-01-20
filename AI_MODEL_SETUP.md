@@ -1,6 +1,7 @@
 # AI 모델 배포 가이드
 
 ## 문제 상황
+
 GitHub에 AI 모델 파일(667MB+)을 올릴 수 없어서 제외했는데, Render에서 어떻게 AI 모델을 실행할 수 있나요?
 
 ## 해결 방법
@@ -14,6 +15,7 @@ GitHub에 AI 모델 파일(667MB+)을 올릴 수 없어서 제외했는데, Rend
    - ResNet 모델: `backend/ai_models/E_of_the_a_of_food/quantity_est/weights/new_opencv_ckpt_b84_e200.pth` (85MB)
 
 2. **공유 링크 생성**
+
    ```
    우클릭 → 공유 → 링크 복사
    예: https://drive.google.com/file/d/1aBcDeFgHiJkLmNoPqRsTuVwXyZ/view?usp=sharing
@@ -45,14 +47,15 @@ MODEL_URLS = {
 #### Step 3: Render 설정 변경
 
 `backend/render.yaml` 수정:
+
 ```yaml
 services:
   - type: web
     name: ttm-backend
     runtime: python
-    plan: starter  # AI 모델 사용 시 유료 플랜 필수
-    buildCommand: pip install -r requirements.txt  # requirements.render.txt → requirements.txt
-    startCommand: bash start_with_models.sh  # start.sh → start_with_models.sh
+    plan: starter # AI 모델 사용 시 유료 플랜 필수
+    buildCommand: pip install -r requirements.txt # requirements.render.txt → requirements.txt
+    startCommand: bash start_with_models.sh # start.sh → start_with_models.sh
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
@@ -61,7 +64,7 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: GOOGLE_API_KEY
-        sync: false  # Gemini AI 코치용
+        sync: false # Gemini AI 코치용
 ```
 
 #### Step 4: Git 커밋 및 Push
@@ -77,6 +80,7 @@ git push origin master
 Render Dashboard → 서비스 선택 → **Manual Deploy** → **Deploy latest commit**
 
 배포 로그에서 확인:
+
 ```
 📥 Step 1: AI 모델 다운로드 확인
 📥 다운로드 중: ai_models/Food_classification/yolov3/weights/best_403food_e200b150v2.pt
@@ -113,7 +117,7 @@ def download_from_s3():
         aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
         aws_secret_access_key=os.getenv('AWS_SECRET_KEY')
     )
-    
+
     s3.download_file(
         'your-bucket-name',
         'models/best_403food_e200b150v2.pt',
@@ -122,6 +126,7 @@ def download_from_s3():
 ```
 
 **환경 변수 설정 필요**:
+
 - `AWS_ACCESS_KEY`
 - `AWS_SECRET_KEY`
 
@@ -130,20 +135,24 @@ def download_from_s3():
 ## 주의사항
 
 ### 1. 메모리 요구사항
+
 - **YOLO + ResNet 실행**: 최소 2GB RAM 필요
 - **Render Starter Plan**: $7/월 (2GB RAM) ✅
 - **Free Plan**: 512MB RAM ❌ (AI 모델 실행 불가)
 
 ### 2. 다운로드 시간
+
 - 첫 배포 시 모델 다운로드: 약 2-5분 소요
 - 재배포 시 모델이 이미 있으면 스킵
 
 ### 3. 디스크 공간
+
 - Render 기본 디스크: 2GB
 - AI 모델 크기: 약 750MB
 - 충분한 여유 공간 확보 필요
 
 ### 4. 대안: AI 기능 비활성화
+
 모델 다운로드가 실패하거나 불필요하면:
 
 ```python
@@ -159,6 +168,7 @@ if DISABLE_AI:
 ```
 
 Render 환경 변수:
+
 ```
 DISABLE_AI_MODELS=true
 ```
@@ -184,6 +194,7 @@ git push origin master
 ## 문제 해결
 
 ### 다운로드 실패 시
+
 ```bash
 # Render 로그 확인
 ❌ 다운로드 실패: HTTPError 404
@@ -194,6 +205,7 @@ git push origin master
 ```
 
 ### 메모리 부족
+
 ```bash
 # Render 로그
 Killed (OOM - Out of Memory)
@@ -202,6 +214,7 @@ Killed (OOM - Out of Memory)
 ```
 
 ### 모델 로드 실패
+
 ```bash
 # 백엔드 로그
 ❌ YOLO 가중치 파일 없음
@@ -217,11 +230,13 @@ Killed (OOM - Out of Memory)
 ## 요약
 
 ✅ **권장 방식**: Google Drive 자동 다운로드
+
 - 간단하고 무료
 - 재배포 시 자동화
 - 유지보수 쉬움
 
 ❌ **비권장**: Git에 직접 커밋
+
 - GitHub 용량 제한 (50MB)
 - Git LFS는 복잡하고 유료
 
