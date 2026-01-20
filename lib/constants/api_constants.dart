@@ -6,10 +6,10 @@ class ApiConstants {
   static const bool useRealDevice = true;
   
   // 프로덕션 모드 (true: 배포된 서버, false: 로컬 개발 서버)
-  static const bool useProductionServer = false;
+  static const bool useProductionServer = true;
   
   // 프로덕션 서버 URL (배포 후 여기에 실제 서버 주소 입력)
-  static const String productionUrl = 'https://your-server.com';
+  static const String productionUrl = 'https://ttm-syzk.onrender.com';
   
   // 실제 기기 시연 시 사용할 PC의 IP 주소 (WiFi 같은 네트워크에 연결 필요)
   // Windows에서 확인: ipconfig (무선 LAN 어댑터 Wi-Fi의 IPv4 주소)
