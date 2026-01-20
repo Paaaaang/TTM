@@ -28,13 +28,21 @@ python-dotenv==1.0.0          # .env 파일 관리
 # ===== Push Notifications =====
 firebase-admin>=6.5.0         # Firebase Cloud Messaging (FCM)
 
+# ===== HTTP & Requests =====
+requests>=2.31.0              # HTTP 라이브러리 (모델 다운로드 등)
+
 # ===== AI & ML =====
-ultralytics>=8.0.0            # YOLO v8 객체 탐지
+ultralytics>=8.0.0            # YOLO v8/v11 객체 탐지
 torch>=2.0.0                  # PyTorch
 torchvision>=0.15.0           # PyTorch Vision
+numpy>=1.24.0                 # 수치 연산
+opencv-python>=4.8.0          # 이미지 처리 (cv2)
 pandas>=2.0.0                 # 데이터 분석
 openpyxl>=3.1.0               # Excel 파일 처리
-pillow>=10.0.0                # 이미지 처리
+pillow>=10.0.0                # 이미지 처리 (PIL)
+
+# ===== Generative AI =====
+google-generativeai>=0.3.0    # Google Gemini API
 
 # ===== Development =====
 # pytest>=7.4.0               # 테스트 프레임워크
