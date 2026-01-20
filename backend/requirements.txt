@@ -17,6 +17,7 @@ bcrypt==4.0.1                     # bcrypt 알고리즘
 # ===== Data Validation =====
 pydantic>=2.5.3               # 데이터 검증 및 모델링
 pydantic-settings>=2.1.0      # 설정 관리
+email-validator>=2.0.0        # 이메일 검증 (Pydantic EmailStr 필수)
 
 # ===== File Upload =====
 python-multipart==0.0.6       # 파일 업로드 처리
