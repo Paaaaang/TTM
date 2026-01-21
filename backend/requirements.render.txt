@@ -37,6 +37,10 @@ pandas>=2.0.0
 openpyxl>=3.1.0
 pillow>=10.0.0
 
+# ===== Utilities =====
+tqdm>=4.66.0
+gdown>=5.1.0
+
 # ===== Generative AI =====
 google-genai>=1.0.0
 

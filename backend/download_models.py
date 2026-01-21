@@ -3,9 +3,9 @@ AI 모델 자동 다운로드 스크립트
 Render 배포 시 시작 전에 실행됩니다.
 """
 import os
-import requests
 from pathlib import Path
 import sys
+import gdown
 
 # 모델 다운로드 URL 설정 (Google Drive 공유 링크 또는 직접 URL)
 MODEL_URLS = {
@@ -20,7 +20,7 @@ MODEL_URLS = {
 }
 
 def download_file(url: str, destination: str):
-    """파일 다운로드"""
+    """파일 다운로드 (Google Drive 대용량 파일 지원)"""
     print(f"📥 다운로드 중: {destination}")
     print(f"   URL: {url}")
     
@@ -33,36 +33,29 @@ def download_file(url: str, destination: str):
     dest_dir.mkdir(parents=True, exist_ok=True)
     print(f"   디렉토리 생성 완료: {dest_dir}")
     
-    # Google Drive 직접 다운로드 URL 변환
+    # Google Drive 파일 ID 추출
     if "drive.google.com" in url:
         file_id = url.split("/d/")[1].split("/")[0] if "/d/" in url else url.split("id=")[1].split("&")[0]
-        url = f"https://drive.google.com/uc?export=download&id={file_id}&confirm=t"
-        print(f"   Google Drive URL 변환: {url}")
+        print(f"   Google Drive File ID: {file_id}")
     
     try:
-        # 스트리밍 다운로드 (큰 파일 지원)
+        # gdown을 사용하여 다운로드 (대용량 파일 지원)
         print("   다운로드 시작...")
-        response = requests.get(url, stream=True, timeout=300, allow_redirects=True)
-        response.raise_for_status()
+        output = gdown.download(url, abs_destination, quiet=False, fuzzy=True)
         
-        total_size = int(response.headers.get('content-length', 0))
-        print(f"   파일 크기: {total_size / (1024*1024):.1f}MB")
-        downloaded = 0
-        
-        with open(abs_destination, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-                    downloaded += len(chunk)
-                    if total_size > 0:
-                        percent = (downloaded / total_size) * 100
-                        print(f"\r   진행률: {percent:.1f}%", end="", flush=True)
-        
-        print(f"\n✅ 다운로드 완료: {abs_destination}")
-        
+        if output is None:
+            print(f"\n❌ 다운로드 실패: gdown이 None을 반환했습니다")
+            return False
+            
         # 파일 크기 확인
         actual_size = os.path.getsize(abs_destination)
+        print(f"\n✅ 다운로드 완료: {abs_destination}")
         print(f"   실제 저장된 크기: {actual_size / (1024*1024):.1f}MB")
+        
+        if actual_size < 1024:  # 1KB 미만이면 오류
+            print(f"\n⚠️ 경고: 파일 크기가 너무 작음 ({actual_size} bytes)")
+            return False
+            
         return True
         
     except Exception as e:
