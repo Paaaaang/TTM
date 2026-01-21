@@ -38,7 +38,7 @@ openpyxl>=3.1.0
 pillow>=10.0.0
 
 # ===== Generative AI =====
-google-generativeai>=0.3.0
+google-genai>=1.0.0
 
 # AI 모델 (PyTorch, YOLO, OpenCV) 제외
 # 무료 티어 메모리 부족 방지

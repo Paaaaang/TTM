@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Body
-import google.generativeai as genai
+from google import genai
 import os
 from pydantic import BaseModel
 from typing import Optional, List
@@ -30,17 +30,16 @@ GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     print("⚠️ WARNING: GOOGLE_API_KEY not found in environment variables.")
 
-# Gemini 설정
+# Gemini 설정 (New google.genai package)
+client = None
 try:
     if GOOGLE_API_KEY:
-        genai.configure(api_key=GOOGLE_API_KEY)
-        # 'gemini-pro' -> 'gemini-2.0-flash' (최신 안정 모델)
-        model = genai.GenerativeModel('gemini-2.0-flash') 
+        client = genai.Client(api_key=GOOGLE_API_KEY)
     else:
-        model = None
+        client = None
 except Exception as e:
     print(f"❌ Gemini Setup Error: {e}")
-    model = None
+    client = None
 
 def get_user_health_context(member_id: int) -> str:
     """사용자의 질병 및 알러지 정보를 가져옵니다."""
@@ -87,7 +86,7 @@ def get_user_health_context(member_id: int) -> str:
 @router.post("/chat", response_model=ChatResponse)
 async def chat_with_ai(request: ChatRequest):
     """Gemini AI와 대화"""
-    if not model:
+    if not client:
         return ChatResponse(reply="AI 서비스가 현재 설정되지 않았습니다. (API Key Missing)")
     
     try:
@@ -110,7 +109,10 @@ async def chat_with_ai(request: ChatRequest):
         사용자 질문: {request.message}
         """
         
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash-exp',
+            contents=prompt
+        )
         return ChatResponse(reply=response.text)
         
     except Exception as e:
@@ -120,7 +122,7 @@ async def chat_with_ai(request: ChatRequest):
 @router.post("/analyze-meal-warning", response_model=MealAnalysisResponse)
 async def analyze_meal_warning(request: MealAnalysisRequest):
     """음식 데이터와 사용자 건강 정보를 바탕으로 주의사항을 1-3줄로 요약"""
-    if not model:
+    if not client:
         return MealAnalysisResponse(warning="AI 서비스 미설정")
         
     try:
@@ -138,7 +140,10 @@ async def analyze_meal_warning(request: MealAnalysisRequest):
         경어체(해요체)를 사용하세요.
         """
         
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash-exp',
+            contents=prompt
+        )
         return MealAnalysisResponse(warning=response.text.strip())
         
     except Exception as e:
