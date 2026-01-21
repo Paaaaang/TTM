@@ -22,49 +22,70 @@ MODEL_URLS = {
 def download_file(url: str, destination: str):
     """파일 다운로드"""
     print(f"📥 다운로드 중: {destination}")
+    print(f"   URL: {url}")
+    
+    # 절대 경로로 변환
+    abs_destination = os.path.abspath(destination)
+    print(f"   절대 경로: {abs_destination}")
     
     # 디렉토리 생성
-    Path(destination).parent.mkdir(parents=True, exist_ok=True)
+    dest_dir = Path(abs_destination).parent
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    print(f"   디렉토리 생성 완료: {dest_dir}")
     
     # Google Drive 직접 다운로드 URL 변환
     if "drive.google.com" in url:
         file_id = url.split("/d/")[1].split("/")[0] if "/d/" in url else url.split("id=")[1].split("&")[0]
-        url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        url = f"https://drive.google.com/uc?export=download&id={file_id}&confirm=t"
+        print(f"   Google Drive URL 변환: {url}")
     
     try:
         # 스트리밍 다운로드 (큰 파일 지원)
-        response = requests.get(url, stream=True, timeout=300)
+        print("   다운로드 시작...")
+        response = requests.get(url, stream=True, timeout=300, allow_redirects=True)
         response.raise_for_status()
         
         total_size = int(response.headers.get('content-length', 0))
+        print(f"   파일 크기: {total_size / (1024*1024):.1f}MB")
         downloaded = 0
         
-        with open(destination, 'wb') as f:
+        with open(abs_destination, 'wb') as f:
             for chunk in response.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
                     downloaded += len(chunk)
                     if total_size > 0:
                         percent = (downloaded / total_size) * 100
-                        print(f"\r진행률: {percent:.1f}%", end="", flush=True)
+                        print(f"\r   진행률: {percent:.1f}%", end="", flush=True)
         
-        print(f"\n✅ 다운로드 완료: {destination}")
+        print(f"\n✅ 다운로드 완료: {abs_destination}")
+        
+        # 파일 크기 확인
+        actual_size = os.path.getsize(abs_destination)
+        print(f"   실제 저장된 크기: {actual_size / (1024*1024):.1f}MB")
         return True
         
     except Exception as e:
         print(f"\n❌ 다운로드 실패: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def check_models_exist():
     """모델 파일 존재 확인"""
+    print("\n🔍 모델 파일 존재 여부 확인:")
+    print(f"   현재 작업 디렉토리: {os.getcwd()}")
+    
     all_exist = True
     for name, info in MODEL_URLS.items():
         path = info["path"]
-        if os.path.exists(path):
-            size = os.path.getsize(path) / (1024 * 1024)  # MB
-            print(f"✅ {name}: {path} ({size:.1f}MB)")
+        abs_path = os.path.abspath(path)
+        
+        if os.path.exists(abs_path):
+            size = os.path.getsize(abs_path) / (1024 * 1024)  # MB
+            print(f"✅ {name}: {abs_path} ({size:.1f}MB)")
         else:
-            print(f"❌ {name}: {path} (없음)")
+            print(f"❌ {name}: {abs_path} (없음)")
             all_exist = False
     return all_exist
 
