@@ -1170,7 +1170,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.softBackground,
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Column(
@@ -1870,7 +1870,9 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+                border: Border(
+                  bottom: BorderSide(color: AppColors.borderLight),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -2342,7 +2344,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 8),
 
                       // 경계선
-                      Divider(color: AppColors.borderLight, thickness: 1, height: 1),
+                      Divider(
+                        color: AppColors.borderLight,
+                        thickness: 1,
+                        height: 1,
+                      ),
 
                       const SizedBox(height: 8),
 
@@ -2727,7 +2733,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Center(
                   child: Column(
                     children: [
-                      Icon(Icons.group_add, size: 60, color: AppColors.borderLight),
+                      Icon(
+                        Icons.group_add,
+                        size: 60,
+                        color: AppColors.borderLight,
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         '그룹이 없습니다',
@@ -2740,7 +2750,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 8),
                       Text(
                         '친구들과 함께하는 그룹을 만들어보세요',
-                        style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ],
                   ),

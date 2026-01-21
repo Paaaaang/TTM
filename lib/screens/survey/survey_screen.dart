@@ -235,10 +235,16 @@ class _SurveyScreenState extends State<SurveyScreen> {
                 height: 56,
                 child: TextButton.icon(
                   onPressed: _prevPage,
-                  icon: const Icon(Icons.arrow_back, color: AppColors.textSecondary),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: AppColors.textSecondary,
+                  ),
                   label: const Text(
                     '뒤로 가기',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 16,
+                    ),
                   ),
                   style: TextButton.styleFrom(
                     backgroundColor: AppColors.softBackground,
@@ -507,7 +513,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? AppColors.background : AppColors.textPrimary,
+                color: isSelected
+                    ? AppColors.background
+                    : AppColors.textPrimary,
               ),
             ),
           ],

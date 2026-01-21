@@ -12,32 +12,42 @@ class AppColors {
   // ========== Base Grey Friends ==========
   /// 제목, 주요 수치
   static const Color textPrimary = Color(0xFF3C4A3E);
+
   /// 설명 텍스트, 보조 정보
   static const Color textSecondary = Color(0xFFA0AFA1);
+
   /// 메인 배경 (권장)
   static const Color background = Color(0xFFFFFFFF);
+
   /// 카드 구분선 (opacity 20%)
   static const Color divider = Color(0x33A0AFA1);
+
   /// 연한 테두리
   static const Color borderLight = Color(0xFFE0E0E0);
+
   /// 회색 아이콘
   static const Color iconGrey = Color(0xFF9E9E9E);
 
   // ========== Identity Natural Palette ==========
   /// 섹션 배경, 그래프 보조
   static const Color natureMid = Color(0xFF739A77);
+
   /// 카드 배경, 결과 요약
   static const Color softBackground = Color(0xFFEEFDEF);
+
   /// 추천 식단, 팁 영역
   static const Color warmNeutral = Color(0xFFF6EDD9);
 
   // ========== Action Spot Palette ==========
   /// 분석 시작, 저장 (primary와 동일)
   static const Color ctaMain = Color(0xFF1DB954);
+
   /// 보조 버튼
   static const Color ctaSub = Color(0xFF497850);
+
   /// 완료 배경, 긍정 결과
   static const Color successBg = Color(0xFFD8F9DB);
+
   /// 선택 카드, 포커스
   static const Color focusAccent = Color(0xFF334574);
 
@@ -57,7 +67,7 @@ class AppColors {
   // ========== 차트/영양소 색상 (기능적 색상 - 유지) ==========
   /// 탄수화물 차트 색상
   static const Color carbs = Color(0xFF2196F3); // 파란색
-  /// 단백질 차트 색상  
+  /// 단백질 차트 색상
   static const Color protein = Color(0xFFFF6B6B); // 오렌지/빨강
   /// 지방 차트 색상
   static const Color fat = Color(0xFFFFA726); // 앰버/오렌지
@@ -66,10 +76,9 @@ class AppColors {
   static const Color shadow = Color(0x1A000000); // 그림자 (투명도 10%)
   static const Color overlayDark = Color(0x80000000); // 어두운 오버레이 (50%)
   static const Color overlayLight = Color(0x0D000000); // 밝은 오버레이 (5%)
-  
+
   // ========== 소셜 로그인 브랜드 색상 (변경 금지) ==========
   static const Color kakao = Color(0xFFFEE500); // 카카오 노랑
   static const Color naver = Color(0xFF03C75A); // 네이버 초록
   static const Color google = Color(0xFF4285F4); // 구글 파랑
 }
-

@@ -343,7 +343,10 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
                 const SizedBox(height: 4),
                 Text(
                   friend.memberName ?? friend.email,
-                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),

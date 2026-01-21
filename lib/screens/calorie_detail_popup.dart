@@ -10,13 +10,13 @@ class CalorieDetailPopup extends StatefulWidget {
   final int targetCalories;
   final User currentUser; // 현재 사용자 정보
   final VoidCallback? onCalorieGoalUpdated; // 칼로리 목표 업데이트 시 콜백
-  
+
   // 각 식사별 칼로리
   final int breakfastCalories;
   final int lunchCalories;
   final int dinnerCalories;
   final int snackCalories;
-  
+
   // 각 식사별 영양소
   final double breakfastCarbs;
   final double breakfastProtein;
@@ -30,12 +30,12 @@ class CalorieDetailPopup extends StatefulWidget {
   final double snackCarbs;
   final double snackProtein;
   final double snackFat;
-  
+
   // 총 영양소
   final double totalCarbs;
   final double totalProtein;
   final double totalFat;
-  
+
   const CalorieDetailPopup({
     super.key,
     required this.intakeCalories,
@@ -72,11 +72,13 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
   late TextEditingController _targetController;
   bool _isEditing = false;
   int _currentTargetCalories = 0;
-  
+
   @override
   void initState() {
     super.initState();
-    _targetController = TextEditingController(text: widget.targetCalories.toString());
+    _targetController = TextEditingController(
+      text: widget.targetCalories.toString(),
+    );
     _currentTargetCalories = widget.targetCalories;
     _targetController.addListener(_handleTargetChange);
   }
@@ -99,7 +101,7 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
 
   void _saveTarget() async {
     final newCalorieGoal = int.tryParse(_targetController.text);
-    
+
     if (newCalorieGoal == null || newCalorieGoal <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -119,10 +121,10 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
 
     if (success) {
       setState(() => _isEditing = false);
-      
+
       // 부모 위젯에 업데이트 알림
       widget.onCalorieGoalUpdated?.call();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -148,9 +150,7 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 500),
         padding: const EdgeInsets.all(10),
@@ -170,10 +170,7 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                   const SizedBox(width: 12),
                   const Text(
                     '오늘의 칼로리',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
                   IconButton(
@@ -184,9 +181,9 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // 칼로리 요약
               Container(
                 padding: const EdgeInsets.all(16),
@@ -214,7 +211,9 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                             label: const Text('수정'),
                             style: TextButton.styleFrom(
                               foregroundColor: const Color(0xFF1DB954),
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
                             ),
                           ),
                       ],
@@ -308,9 +307,9 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // 섭취/소모 칼로리
               Container(
                 padding: const EdgeInsets.all(16),
@@ -350,11 +349,7 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                         ],
                       ),
                     ),
-                    Container(
-                      width: 1,
-                      height: 40,
-                      color: Colors.grey[300],
-                    ),
+                    Container(width: 1, height: 40, color: Colors.grey[300]),
                     Expanded(
                       child: Column(
                         children: [
@@ -377,10 +372,7 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                           ),
                           const Text(
                             'kcal',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.blue,
-                            ),
+                            style: TextStyle(fontSize: 12, color: Colors.blue),
                           ),
                         ],
                       ),
@@ -388,19 +380,16 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // 상세 영양 정보
               const Text(
                 '상세 영양 정보',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              
+
               // 탄단지 목표 칼로리바 (총량)
               Container(
                 padding: const EdgeInsets.all(16),
@@ -416,18 +405,34 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                       builder: (context) {
                         final targetCalories = _currentTargetCalories;
                         final targetCarbs = (targetCalories * 0.5 / 4).round();
-                        final targetProtein = (targetCalories * 0.3 / 4).round();
+                        final targetProtein = (targetCalories * 0.3 / 4)
+                            .round();
                         final targetFat = (targetCalories * 0.2 / 9).round();
                         return Row(
                           children: [
                             Expanded(
-                              child: _buildNutrientColumn('탄수화물', widget.totalCarbs.toInt(), targetCarbs, AppColors.carbs),
+                              child: _buildNutrientColumn(
+                                '탄수화물',
+                                widget.totalCarbs.toInt(),
+                                targetCarbs,
+                                AppColors.carbs,
+                              ),
                             ),
                             Expanded(
-                              child: _buildNutrientColumn('단백질', widget.totalProtein.toInt(), targetProtein, AppColors.protein),
+                              child: _buildNutrientColumn(
+                                '단백질',
+                                widget.totalProtein.toInt(),
+                                targetProtein,
+                                AppColors.protein,
+                              ),
                             ),
                             Expanded(
-                              child: _buildNutrientColumn('지방', widget.totalFat.toInt(), targetFat, AppColors.fat),
+                              child: _buildNutrientColumn(
+                                '지방',
+                                widget.totalFat.toInt(),
+                                targetFat,
+                                AppColors.fat,
+                              ),
                             ),
                           ],
                         );
@@ -437,46 +442,64 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                     // 당류/나트륨 수치 표시 (TODO: 추후 DB에 추가 예정)
                     Text(
                       '당류, 나트륨 정보는 추후 추가 예정',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[400],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[400]),
                       textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // 식사별 상세 정보
               const Text(
                 '식사별 상세',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              
+
               // 아침
-              _buildMealDetail('아침', '🌅', widget.breakfastCalories, 
-                widget.breakfastCarbs, widget.breakfastProtein, widget.breakfastFat),
+              _buildMealDetail(
+                '아침',
+                '🌅',
+                widget.breakfastCalories,
+                widget.breakfastCarbs,
+                widget.breakfastProtein,
+                widget.breakfastFat,
+              ),
               const SizedBox(height: 8),
-              
+
               // 점심
-              _buildMealDetail('점심', '🌞', widget.lunchCalories, 
-                widget.lunchCarbs, widget.lunchProtein, widget.lunchFat),
+              _buildMealDetail(
+                '점심',
+                '🌞',
+                widget.lunchCalories,
+                widget.lunchCarbs,
+                widget.lunchProtein,
+                widget.lunchFat,
+              ),
               const SizedBox(height: 8),
-              
+
               // 저녁
-              _buildMealDetail('저녁', '🌙', widget.dinnerCalories, 
-                widget.dinnerCarbs, widget.dinnerProtein, widget.dinnerFat),
+              _buildMealDetail(
+                '저녁',
+                '🌙',
+                widget.dinnerCalories,
+                widget.dinnerCarbs,
+                widget.dinnerProtein,
+                widget.dinnerFat,
+              ),
               const SizedBox(height: 8),
-              
+
               // 간식
-              _buildMealDetail('간식', '🍎', widget.snackCalories, 
-                widget.snackCarbs, widget.snackProtein, widget.snackFat),
+              _buildMealDetail(
+                '간식',
+                '🍎',
+                widget.snackCalories,
+                widget.snackCarbs,
+                widget.snackProtein,
+                widget.snackFat,
+              ),
             ],
           ),
         ),
@@ -490,10 +513,7 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
         Text(
           '$value kcal',
@@ -507,9 +527,14 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
     );
   }
 
-  Widget _buildNutrientColumn(String label, int current, int target, Color color) {
+  Widget _buildNutrientColumn(
+    String label,
+    int current,
+    int target,
+    Color color,
+  ) {
     final percentage = (current / target * 100).toInt();
-    
+
     return Column(
       children: [
         Container(
@@ -533,29 +558,29 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
         const SizedBox(height: 8),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
         Text(
           '$current / $target g',
-          style: TextStyle(
-            fontSize: 11,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 11, color: Colors.grey[600]),
         ),
       ],
     );
   }
-  
+
   // 식사별 상세 정보 위젯
-  Widget _buildMealDetail(String mealName, String emoji, int calories, 
-      double carbs, double protein, double fat) {
+  Widget _buildMealDetail(
+    String mealName,
+    String emoji,
+    int calories,
+    double carbs,
+    double protein,
+    double fat,
+  ) {
     // 칼로리가 0이면 회색으로 표시
     final hasData = calories > 0;
-    
+
     return Container(
       padding: const EdgeInsets.all(7),
       decoration: BoxDecoration(
@@ -575,7 +600,7 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
             ),
           ),
           const SizedBox(width: 12),
-          
+
           // 칼로리 수치
           SizedBox(
             width: 70,
@@ -589,9 +614,9 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
               textAlign: TextAlign.end,
             ),
           ),
-          
+
           const SizedBox(width: 12),
-          
+
           // 영양소 정보 (탄단지)
           Row(
             children: [
@@ -606,7 +631,7 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
       ),
     );
   }
-  
+
   // 영양소 뱃지 위젯
   Widget _buildNutrientBadge(String label, double value, Color color) {
     return Container(

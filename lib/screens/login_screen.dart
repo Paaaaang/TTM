@@ -115,11 +115,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             fillColor: AppColors.softBackground,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: AppColors.borderLight),
+                              borderSide: BorderSide(
+                                color: AppColors.borderLight,
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: AppColors.borderLight),
+                              borderSide: BorderSide(
+                                color: AppColors.borderLight,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -156,11 +160,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             fillColor: AppColors.softBackground,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: AppColors.borderLight),
+                              borderSide: BorderSide(
+                                color: AppColors.borderLight,
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: AppColors.borderLight),
+                              borderSide: BorderSide(
+                                color: AppColors.borderLight,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -223,7 +231,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: Divider(color: AppColors.borderLight, thickness: 1),
+                          child: Divider(
+                            color: AppColors.borderLight,
+                            thickness: 1,
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -236,7 +247,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         Expanded(
-                          child: Divider(color: AppColors.borderLight, thickness: 1),
+                          child: Divider(
+                            color: AppColors.borderLight,
+                            thickness: 1,
+                          ),
                         ),
                       ],
                     ),

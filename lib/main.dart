@@ -59,26 +59,26 @@ import 'dart:io' show Platform;
 /// Flutter 앱이 시작될 때 가장 먼저 실행되는 함수
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // 날짜 형식 초기화
   await initializeDateFormatting('ko_KR', null);
-  
+
   // 모바일 플랫폼에서만 Firebase 및 권한 초기화
   if (!kIsWeb) {
     try {
       // Firebase 초기화 (모바일만)
       await Firebase.initializeApp();
-      
+
       // 알림 서비스 초기화 (모바일만)
       await NotificationService().initialize();
-      
+
       // 앱 시작 시 필수 권한 요청 (모바일만)
       await PermissionService.requestAllPermissions();
     } catch (e) {
       print('⚠️ Firebase/권한 초기화 실패: $e');
     }
   }
-  
+
   runZonedGuarded(
     () => runApp(const MyApp()),
     (error, stack) {
@@ -122,10 +122,7 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('ko', 'KR'),
-            Locale('en', 'US'),
-          ],
+          supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
           // iOS 스와이프 뒤로가기 제스처 활성화
           theme: ThemeData(
             // 기본 폰트를 Pretendard로 설정
@@ -152,98 +149,100 @@ class MyApp extends StatelessWidget {
               },
             ),
             // AppBar 테마
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: AppColors.textPrimary,
-          elevation: 0,
-          centerTitle: true,
-        ),
-        // 하단 네비게이션 바 테마
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textSecondary,
-          type: BottomNavigationBarType.fixed,
-          elevation: 8,
-        ),
-        // 카드 테마
-        cardTheme: CardThemeData(
-          color: Colors.white,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        // ElevatedButton 테마
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+              foregroundColor: AppColors.textPrimary,
+              elevation: 0,
+              centerTitle: true,
+            ),
+            // 하단 네비게이션 바 테마
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: Colors.white,
+              selectedItemColor: AppColors.primary,
+              unselectedItemColor: AppColors.textSecondary,
+              type: BottomNavigationBarType.fixed,
+              elevation: 8,
+            ),
+            // 카드 테마
+            cardTheme: CardThemeData(
+              color: Colors.white,
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            // ElevatedButton 테마
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      // 초기 라우트 설정
-      initialRoute: '/',
-      // 정적 라우트 정의
-      routes: {
-        '/': (context) => const AuthWrapper(),
-        '/onboarding': (context) => const OnboardingScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignupScreen(),
-        '/main': (context) => const MainScreen(),
-        '/exercise/add': (context) => const ExerciseAddScreen(),
-        '/community': (context) => const CommunityHomeScreen(),
-        '/community/create': (context) => const CreatePostScreen(),
-        '/settings': (context) => const SettingsScreen(),
-        '/help': (context) => const HelpScreen(),
-        '/settings/language': (context) => const LanguageSettingsScreen(),
-        '/friends': (context) => const FriendsListScreen(),
-        '/friends/add': (context) => const AddFriendScreen(),
-        '/settings/delete-account': (context) => const DeleteAccountScreen(),
-        '/settings/profile-edit': (context) => const ProfileEditScreen(),
-        '/settings/feedback': (context) => const FeedbackScreen(),
-        '/activity': (context) => const ActivityDetailScreen(),
-      },
-      /// 동적 라우트 생성 핸들러
-      /// 정적 라우트에서 찾지 못한 경로를 처리
-      onGenerateRoute: (settings) {
-        // 식단 추가 화면 (arguments로 날짜와 식사 유형 전달)
-        if (settings.name == '/meal/add') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (context) => MealAddScreen(
-              selectedDate: args?['selectedDate'] as DateTime?,
-              mealType: args?['mealType'] as String?,
-            ),
-          );
-        }
-        
-        // 사진 촬영 식단 추가 화면 (arguments로 날짜와 식사 유형 전달)
-        if (settings.name == '/meal/camera') {
-          return MaterialPageRoute(
-            builder: (context) => const CameraMealScreen(),
-            settings: settings, // arguments 전달
-          );
-        }
-        
-        // 게시글 상세 화면 (동적 라우트)
-        if (settings.name == '/community/post') {
-          final postId = settings.arguments as int?;
-          if (postId != null) {
-            return MaterialPageRoute(
-              builder: (context) => PostDetailScreen(postId: postId),
-            );
-          }
-        }
-        
-        // 그 외의 경로는 null 반환
-        return null;
-      },
-    );
+          // 초기 라우트 설정
+          initialRoute: '/',
+          // 정적 라우트 정의
+          routes: {
+            '/': (context) => const AuthWrapper(),
+            '/onboarding': (context) => const OnboardingScreen(),
+            '/login': (context) => const LoginScreen(),
+            '/signup': (context) => const SignupScreen(),
+            '/main': (context) => const MainScreen(),
+            '/exercise/add': (context) => const ExerciseAddScreen(),
+            '/community': (context) => const CommunityHomeScreen(),
+            '/community/create': (context) => const CreatePostScreen(),
+            '/settings': (context) => const SettingsScreen(),
+            '/help': (context) => const HelpScreen(),
+            '/settings/language': (context) => const LanguageSettingsScreen(),
+            '/friends': (context) => const FriendsListScreen(),
+            '/friends/add': (context) => const AddFriendScreen(),
+            '/settings/delete-account': (context) =>
+                const DeleteAccountScreen(),
+            '/settings/profile-edit': (context) => const ProfileEditScreen(),
+            '/settings/feedback': (context) => const FeedbackScreen(),
+            '/activity': (context) => const ActivityDetailScreen(),
+          },
+
+          /// 동적 라우트 생성 핸들러
+          /// 정적 라우트에서 찾지 못한 경로를 처리
+          onGenerateRoute: (settings) {
+            // 식단 추가 화면 (arguments로 날짜와 식사 유형 전달)
+            if (settings.name == '/meal/add') {
+              final args = settings.arguments as Map<String, dynamic>?;
+              return MaterialPageRoute(
+                builder: (context) => MealAddScreen(
+                  selectedDate: args?['selectedDate'] as DateTime?,
+                  mealType: args?['mealType'] as String?,
+                ),
+              );
+            }
+
+            // 사진 촬영 식단 추가 화면 (arguments로 날짜와 식사 유형 전달)
+            if (settings.name == '/meal/camera') {
+              return MaterialPageRoute(
+                builder: (context) => const CameraMealScreen(),
+                settings: settings, // arguments 전달
+              );
+            }
+
+            // 게시글 상세 화면 (동적 라우트)
+            if (settings.name == '/community/post') {
+              final postId = settings.arguments as int?;
+              if (postId != null) {
+                return MaterialPageRoute(
+                  builder: (context) => PostDetailScreen(postId: postId),
+                );
+              }
+            }
+
+            // 그 외의 경로는 null 반환
+            return null;
+          },
+        );
       },
     );
   }
@@ -261,9 +260,7 @@ class AuthWrapper extends StatelessWidget {
         // 로딩 중
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 

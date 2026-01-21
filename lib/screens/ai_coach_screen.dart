@@ -126,7 +126,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.primary, AppColors.primaryDark],
+            colors: [Colors.purple, Colors.blue],
           ),
         ),
         child: SafeArea(
