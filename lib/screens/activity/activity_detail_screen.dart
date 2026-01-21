@@ -9,7 +9,7 @@ class ActivityDetailScreen extends StatelessWidget {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F5F5),
+        backgroundColor: AppColors.softBackground,
         appBar: AppBar(
           backgroundColor: const Color(0xFF1DB954),
           foregroundColor: Colors.white,

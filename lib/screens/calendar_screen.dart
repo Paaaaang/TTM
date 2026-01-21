@@ -301,9 +301,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     } else if (score >= 60) {
       scoreColor = AppColors.primary; // 양호
     } else if (score >= 40) {
-      scoreColor = const Color(0xFFFFA726); // 주황색 (보통)
+      scoreColor = AppColors.natureMid; // 보통
     } else {
-      scoreColor = const Color(0xFFFF6B6B); // 빨간색 (개선 필요)
+      scoreColor = const Color(0xFFFF6B6B); // 개선 필요 (빨간색 유지)
     }
     
     return GestureDetector(

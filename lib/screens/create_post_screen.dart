@@ -666,7 +666,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   /// 아바타 색상 생성
   Color _getAvatarColor(String nickname) {
     final colors = [
-      const Color(0xFF4CAF50),
+      AppColors.primary,
       const Color(0xFF2196F3),
       const Color(0xFFF44336),
       const Color(0xFFFF9800),
