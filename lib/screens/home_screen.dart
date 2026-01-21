@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ttm/constants/app_colors.dart';
 import 'package:ttm/screens/calendar_screen.dart';
 import 'package:ttm/services/auth_service.dart';
@@ -23,6 +24,7 @@ import 'package:ttm/services/badge_service.dart';
 import 'package:ttm/models/friend_group.dart';
 import 'package:ttm/models/badge.dart';
 import 'package:ttm/widgets/create_group_dialog.dart';
+
 // 홈 화면 위젯
 // 상단: 칼로리 트래커
 // 중단: 식단/운동/커뮤니티 탭
@@ -45,35 +47,35 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isIotProcessing = false;
   bool _isFastPolling = false; // 빠른 폴링 모드 플래그
   bool _useDefaultMemberId = false; // 404 발생 시 기본 memberId 사용
-  
+
   // 현재 활성화된 탭 (0: 식단, 1: 운동)
   int _currentTab = 0;
-  
+
   // 선택된 날짜 (기본값: 오늘)
-  DateTime _selectedDate = DateTime.now();  
+  DateTime _selectedDate = DateTime.now();
+
   /// 인증 서비스
   final AuthService _authService = AuthService();
-  
+
   /// 식단 서비스
   final MealService _mealService = MealService();
-  
+
   /// 운동 서비스
   final ExerciseService _exerciseService = ExerciseService();
-  
-  
+
   /// 친구 그룹 서비스
   final FriendGroupService _friendGroupService = FriendGroupService();
   final BadgeService _badgeService = BadgeService();
-  
+
   /// 현재 사용자 정보
   User? _currentUser;
-  
+
   /// 오늘의 식단 데이터 (DB에서 로드)
   List<MealLog> _todayMeals = [];
-  
+
   /// 오늘의 운동 데이터 (DB에서 로드)
   List<ExerciseLog> _todayExercises = [];
-  
+
   /// 내 친구 그룹 목록
   List<FriendGroup> _myGroups = [];
   FriendGroup? _selectedGroup;
@@ -81,19 +83,19 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoadingGroupMembers = false;
   String? _groupMembersError;
   final Map<int, List<GroupMemberInfo>> _groupMembersCache = {};
-  
+
   /// 친구 목록
   List<User> _friends = [];
-  
+
   /// 로딩 상태
   bool _isLoadingMeals = false;
   bool _isLoadingExercises = false;
   bool _isLoadingGroups = false;
-  
+
   final GlobalKey _dietKey = GlobalKey();
   final GlobalKey _exerciseKey = GlobalKey();
   final GlobalKey _friendGroupKey = GlobalKey();
-  
+
   /// 각 식사 타입별 단식 상태 (breakfast, lunch, dinner, snack)
   Map<String, bool> _fastingStatus = {
     'breakfast': false,
@@ -113,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadFriends();
     // start polling will be kicked after user info is loaded
   }
-  
+
   /// 사용자 정보 로드
   Future<void> _loadUserInfo() async {
     final user = await _authService.getCurrentUser();
@@ -154,10 +156,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _checkRaspberryStatus() async {
     if (_currentUser == null) return;
-    
+
     // 이미 404 경험이 있으면 바로 기본 memberId 사용
     final memberIdToTry = _useDefaultMemberId ? 1 : _currentUser!.memberId;
-    
+
     try {
       var status = await _iotService.getStatus(memberIdToTry);
       if (mounted) setState(() => _isRaspberryConnected = status.connected);
@@ -165,16 +167,16 @@ class _HomeScreenState extends State<HomeScreen> {
         final proc = await _iotService.getProcessingStatus(memberIdToTry);
         final processing = proc['processing'] == true;
         final wasProcessing = _isIotProcessing; // 이전 상태 저장
-        
+
         if (mounted) {
           setState(() => _isIotProcessing = processing);
-          
+
           // Processing이 끝났을 때 (true → false)
           if (wasProcessing && !processing) {
             // 식단 데이터 새로고침
             _loadTodayMeals();
           }
-          
+
           // If processing started, switch to fast polling
           if (processing && !_isFastPolling) {
             _startFastPolling();
@@ -198,33 +200,44 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) setState(() => _isRaspberryConnected = false);
     }
   }
-  
+
   /// 오늘의 식단 데이터 로드
   Future<void> _loadTodayMeals() async {
     if (_currentUser == null) {
       // 사용자 정보가 없으면 먼저 로드
       await _loadUserInfo();
     }
-    
+
     if (_currentUser == null) {
       return; // 여전히 사용자 정보가 없으면 리턴
     }
-    
+
     setState(() {
       _isLoadingMeals = true;
     });
-    
+
     try {
       // 선택된 날짜에 해당하는 식단만 가져오기
-      final startOfDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
-      final endOfDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, 23, 59, 59);
-      
+      final startOfDay = DateTime(
+        _selectedDate.year,
+        _selectedDate.month,
+        _selectedDate.day,
+      );
+      final endOfDay = DateTime(
+        _selectedDate.year,
+        _selectedDate.month,
+        _selectedDate.day,
+        23,
+        59,
+        59,
+      );
+
       final meals = await _mealService.getMealsByDateRange(
         _currentUser!.memberId,
         startOfDay,
         endOfDay,
       );
-      
+
       if (mounted) {
         setState(() {
           _todayMeals = meals;
@@ -247,20 +260,31 @@ class _HomeScreenState extends State<HomeScreen> {
       // 사용자 정보가 없으면 먼저 로드
       await _loadUserInfo();
     }
-    
+
     if (_currentUser == null) {
       return; // 여전히 사용자 정보가 없으면 리턴
     }
-    
+
     setState(() {
       _isLoadingExercises = true;
     });
-    
+
     try {
       // 선택된 날짜에 해당하는 운동만 가져오기
-      final startOfDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
-      final endOfDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, 23, 59, 59);
-      
+      final startOfDay = DateTime(
+        _selectedDate.year,
+        _selectedDate.month,
+        _selectedDate.day,
+      );
+      final endOfDay = DateTime(
+        _selectedDate.year,
+        _selectedDate.month,
+        _selectedDate.day,
+        23,
+        59,
+        59,
+      );
+
       final exercises = await _exerciseService.getExercisesByDateRange(
         _currentUser!.memberId,
         startOfDay,
@@ -288,18 +312,20 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_currentUser == null) {
       await _loadUserInfo();
     }
-    
+
     if (_currentUser == null) {
       return;
     }
-    
+
     setState(() {
       _isLoadingGroups = true;
     });
-    
+
     try {
-      final groups = await _friendGroupService.getMyGroups(_currentUser!.memberId);
-      
+      final groups = await _friendGroupService.getMyGroups(
+        _currentUser!.memberId,
+      );
+
       if (mounted) {
         setState(() {
           _myGroups = groups;
@@ -307,7 +333,8 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_myGroups.isEmpty) {
             _selectedGroup = null;
             _selectedGroupMembers = [];
-          } else if (_selectedGroup == null || !_myGroups.any((g) => g.groupId == _selectedGroup!.groupId)) {
+          } else if (_selectedGroup == null ||
+              !_myGroups.any((g) => g.groupId == _selectedGroup!.groupId)) {
             _selectedGroup = _myGroups.first;
           }
         });
@@ -440,7 +467,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _removeGroupMember(int groupId, int memberId) async {
-    final success = await _friendGroupService.removeGroupMember(groupId, memberId);
+    final success = await _friendGroupService.removeGroupMember(
+      groupId,
+      memberId,
+    );
     if (!mounted) return;
     if (!success) {
       await _loadGroupMembers(groupId);
@@ -522,7 +552,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close),
                       color: Colors.grey[600],
-                    )
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -582,10 +612,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 16),
                 const Text(
                   '획득한 배지',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
                 FutureBuilder<List<MemberBadge>>(
@@ -615,9 +642,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             badge.badgeName,
                             style: const TextStyle(fontSize: 12),
                           ),
-                          backgroundColor: const Color(0xFF1DB954).withOpacity(0.08),
+                          backgroundColor: const Color(
+                            0xFF1DB954,
+                          ).withOpacity(0.08),
                           shape: StadiumBorder(
-                            side: BorderSide(color: const Color(0xFF1DB954).withOpacity(0.3)),
+                            side: BorderSide(
+                              color: const Color(0xFF1DB954).withOpacity(0.3),
+                            ),
                           ),
                         );
                       }).toList(),
@@ -637,14 +668,14 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_currentUser == null) {
       await _loadUserInfo();
     }
-    
+
     if (_currentUser == null) {
       return;
     }
-    
+
     try {
       final friends = await _authService.getFriends(_currentUser!.memberId);
-      
+
       if (mounted) {
         setState(() {
           _friends = friends;
@@ -661,9 +692,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_friends.isEmpty) {
       await _loadFriends();
     }
-    
+
     if (!mounted) return;
-    
+
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => CreateGroupDialog(
@@ -730,9 +761,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('삭제'),
           ),
         ],
@@ -802,11 +831,15 @@ class _HomeScreenState extends State<HomeScreen> {
     final dietPosition = _getWidgetPosition(_dietKey);
     final exercisePosition = _getWidgetPosition(_exerciseKey);
     final friendGroupPosition = _getWidgetPosition(_friendGroupKey);
-    
+
     // 각 섹션의 상단 위치가 화면 상단에서 250px 이내에 있는지 확인
-    if (friendGroupPosition != null && friendGroupPosition <= 250 && friendGroupPosition >= -100) {
+    if (friendGroupPosition != null &&
+        friendGroupPosition <= 250 &&
+        friendGroupPosition >= -100) {
       if (_currentTab != 2) setState(() => _currentTab = 2);
-    } else if (exercisePosition != null && exercisePosition <= 250 && exercisePosition >= -100) {
+    } else if (exercisePosition != null &&
+        exercisePosition <= 250 &&
+        exercisePosition >= -100) {
       if (_currentTab != 1) setState(() => _currentTab = 1);
     } else if (dietPosition != null && dietPosition <= 250) {
       if (_currentTab != 0) setState(() => _currentTab = 0);
@@ -815,7 +848,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 위젯의 화면 내 위치 가져오기
   double? _getWidgetPosition(GlobalKey key) {
-    final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox =
+        key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return null;
     final position = renderBox.localToGlobal(Offset.zero);
     return position.dy;
@@ -835,7 +869,7 @@ class _HomeScreenState extends State<HomeScreen> {
         targetKey = _friendGroupKey;
         break;
     }
-    
+
     if (targetKey?.currentContext != null) {
       setState(() => _currentTab = index);
       Scrollable.ensureVisible(
@@ -849,12 +883,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 식단 칼로리 계산 (특정 식사 유형) - 최신 식단만 사용
   int _calculateMealCalories(String mealType) {
-    final mealLogs = _todayMeals.where((meal) => meal.mealType == mealType).toList();
+    final mealLogs = _todayMeals
+        .where((meal) => meal.mealType == mealType)
+        .toList();
     if (mealLogs.isEmpty) return 0;
-    
+
     // 가장 최근 식단만 선택
-    final latestMeal = mealLogs.reduce((a, b) => 
-      a.createdAt!.isAfter(b.createdAt!) ? a : b
+    final latestMeal = mealLogs.reduce(
+      (a, b) => a.createdAt!.isAfter(b.createdAt!) ? a : b,
     );
     return latestMeal.totalCalories.toInt();
   }
@@ -862,12 +898,18 @@ class _HomeScreenState extends State<HomeScreen> {
   // 총 칼로리 계산 - 각 meal_type별 최신 식단만 합산
   int get _totalCalories {
     final mealTypes = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
-    return mealTypes.fold<int>(0, (sum, type) => sum + _calculateMealCalories(type));
+    return mealTypes.fold<int>(
+      0,
+      (sum, type) => sum + _calculateMealCalories(type),
+    );
   }
 
   // 운동 소모 칼로리 계산
   int get _totalExerciseCalories {
-    return _todayExercises.fold<int>(0, (sum, ex) => sum + (ex.caloriesBurned?.toInt() ?? 0));
+    return _todayExercises.fold<int>(
+      0,
+      (sum, ex) => sum + (ex.caloriesBurned?.toInt() ?? 0),
+    );
   }
 
   // 순 칼로리 (섭취 - 소모)
@@ -875,7 +917,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 목표 칼로리 (사용자 설정 값 또는 기본값 2000)
   int get _targetCalories => _currentUser?.calorieGoal ?? 2000;
-  
+
   // 날짜 변경 함수
   void _changeDate(int days) {
     setState(() {
@@ -885,17 +927,20 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadTodayMeals();
     _loadTodayExercises();
   }
-  
+
   // 탄수화물 총량 계산 (g)
   double get _totalCarbs {
-    return _todayMeals.fold<double>(0, (sum, meal) => sum + meal.totalCarbohydrates);
+    return _todayMeals.fold<double>(
+      0,
+      (sum, meal) => sum + meal.totalCarbohydrates,
+    );
   }
-  
+
   // 단백질 총량 계산 (g)
   double get _totalProtein {
     return _todayMeals.fold<double>(0, (sum, meal) => sum + meal.totalProtein);
   }
-  
+
   // 지방 총량 계산 (g)
   double get _totalFat {
     return _todayMeals.fold<double>(0, (sum, meal) => sum + meal.totalFat);
@@ -928,7 +973,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final fatRatio = (fatG * 9) / macroCalories;
 
     double score = 100;
-    score -= ((carbRatio - 0.5).abs() + (proteinRatio - 0.3).abs() + (fatRatio - 0.2).abs()) * 100;
+    score -=
+        ((carbRatio - 0.5).abs() +
+            (proteinRatio - 0.3).abs() +
+            (fatRatio - 0.2).abs()) *
+        100;
 
     if (sugarG > 50) {
       score -= ((sugarG - 50) / 5).clamp(0, 20);
@@ -960,9 +1009,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('영양 점수 안내'),
-        content: const Text(
-          '일일 기준으로 영양 점수는 탄/단/지 비율과 당류·나트륨 섭취량을 기준으로 계산돼요.',
-        ),
+        content: const Text('일일 기준으로 영양 점수는 탄/단/지 비율과 당류·나트륨 섭취량을 기준으로 계산돼요.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -983,7 +1030,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final lastFriday = lastDayOfMonth.subtract(
       Duration(days: (lastDayOfMonth.weekday - DateTime.friday + 7) % 7),
     );
-    final isMonthly = now.year == lastFriday.year &&
+    final isMonthly =
+        now.year == lastFriday.year &&
         now.month == lastFriday.month &&
         now.day == lastFriday.day;
 
@@ -1028,7 +1076,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_currentUser == null) return;
 
     final days = isMonthly ? 30 : 7;
-    final stats = await _mealService.getMealStats(_currentUser!.memberId, days: days);
+    final stats = await _mealService.getMealStats(
+      _currentUser!.memberId,
+      days: days,
+    );
 
     int breakfastDays = 0;
     int lowProteinDinnerDays = 0;
@@ -1070,45 +1121,49 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   // 식사 타입별 탄수화물 계산 (g)
   double _getMealCarbs(String mealType) {
     return _todayMeals
         .where((meal) => meal.mealType == mealType)
         .fold<double>(0, (sum, meal) => sum + meal.totalCarbohydrates);
   }
-  
+
   // 식사 타입별 단백질 계산 (g)
   double _getMealProtein(String mealType) {
     return _todayMeals
         .where((meal) => meal.mealType == mealType)
         .fold<double>(0, (sum, meal) => sum + meal.totalProtein);
   }
-  
+
   // 식사 타입별 지방 계산 (g)
   double _getMealFat(String mealType) {
     return _todayMeals
         .where((meal) => meal.mealType == mealType)
         .fold<double>(0, (sum, meal) => sum + meal.totalFat);
   }
-  
+
   // 식사 타입별 당류 계산 (g)
   double _getMealSugar(String mealType) {
     return _todayMeals
         .where((meal) => meal.mealType == mealType)
         .fold<double>(
           0,
-          (sum, meal) => sum + meal.items.fold<double>(0, (s, item) => s + (item.sugarG ?? 0)),
+          (sum, meal) =>
+              sum +
+              meal.items.fold<double>(0, (s, item) => s + (item.sugarG ?? 0)),
         );
   }
-  
+
   // 식사 타입별 나트륨 계삸 (mg)
   double _getMealSodium(String mealType) {
     return _todayMeals
         .where((meal) => meal.mealType == mealType)
         .fold<double>(
           0,
-          (sum, meal) => sum + meal.items.fold<double>(0, (s, item) => s + (item.sodiumMg ?? 0)),
+          (sum, meal) =>
+              sum +
+              meal.items.fold<double>(0, (s, item) => s + (item.sodiumMg ?? 0)),
         );
   }
 
@@ -1139,9 +1194,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         // 식단 섹션
                         _buildSection('식단', _buildDietContent(), _dietKey),
                         // 운동 섹션
-                        _buildSection('운동', _buildExerciseContent(), _exerciseKey),
+                        _buildSection(
+                          '운동',
+                          _buildExerciseContent(),
+                          _exerciseKey,
+                        ),
                         // 친구 그룹 섹션
-                        _buildSection('친구 그룹', _buildFriendGroupContent(), _friendGroupKey),
+                        _buildSection(
+                          '친구 그룹',
+                          _buildFriendGroupContent(),
+                          _friendGroupKey,
+                        ),
                         const SizedBox(height: 80),
                       ],
                     ),
@@ -1160,7 +1223,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: const [
                       CircularProgressIndicator(),
                       SizedBox(height: 16),
-                      Text('스마트 글래스에서 정보를 받아오고 있습니다.', style: TextStyle(color: Colors.white, fontSize: 16)),
+                      Text(
+                        '스마트 글래스에서 정보를 받아오고 있습니다.',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ],
                   ),
                 ),
@@ -1174,22 +1240,22 @@ class _HomeScreenState extends State<HomeScreen> {
   // 상단 헤더 빌드 (날짜 선택기)
   Widget _buildHeader() {
     final today = DateTime.now();
-    
+
     String formatDate(DateTime date) {
       return '${date.month}/${date.day}';
     }
-    
+
     String getWeekday(DateTime date) {
       const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
       return weekdays[date.weekday - 1];
     }
-    
+
     String getDayLabel(DateTime date) {
       final now = DateTime.now();
       final nowDate = DateTime(now.year, now.month, now.day);
       final compareDate = DateTime(date.year, date.month, date.day);
       final difference = compareDate.difference(nowDate).inDays;
-      
+
       if (difference == 0) {
         return '오늘';
       } else if (difference == -1) {
@@ -1199,17 +1265,19 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       return ''; // 빈 문자열 반환
     }
-    
+
     // 선택된 날짜가 어제/오늘/내일 중 무엇인지 판단
     final now = DateTime.now();
     final nowDate = DateTime(now.year, now.month, now.day);
-    final selectedDateOnly = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final selectedDateOnly = DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
+    );
     final difference = selectedDateOnly.difference(nowDate).inDays;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF1DB954),
-      ),
+      decoration: const BoxDecoration(color: Color(0xFF1DB954)),
       child: SafeArea(
         bottom: false,
         child: Column(
@@ -1242,41 +1310,44 @@ class _HomeScreenState extends State<HomeScreen> {
                       // debug text to show connection status
                       Text(
                         _isRaspberryConnected ? '연결' : '끊김',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       IconButton(
-                    onPressed: () async {
-                      // 캘린더 화면으로 이동
-                      final selectedDate = await Navigator.push<DateTime>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CalendarScreen(),
-                        ),
-                      );
-                      
-                      // 선택된 날짜가 있으면 해당 날짜로 변경
-                      if (selectedDate != null) {
-                        setState(() {
-                          _selectedDate = selectedDate;
-                        });
-                        // 선택된 날짜의 데이터 로드
-                        _loadTodayMeals();
-                        _loadTodayExercises();
-                      }
-                    },
-                    icon: const Icon(Icons.calendar_today_outlined),
-                    iconSize: 22,
-                    color: Colors.white,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                        onPressed: () async {
+                          // 캘린더 화면으로 이동
+                          final selectedDate = await Navigator.push<DateTime>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CalendarScreen(),
+                            ),
+                          );
+
+                          // 선택된 날짜가 있으면 해당 날짜로 변경
+                          if (selectedDate != null) {
+                            setState(() {
+                              _selectedDate = selectedDate;
+                            });
+                            // 선택된 날짜의 데이터 로드
+                            _loadTodayMeals();
+                            _loadTodayExercises();
+                          }
+                        },
+                        icon: const Icon(Icons.calendar_today_outlined),
+                        iconSize: 22,
+                        color: Colors.white,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            
+
             // 중단: 날짜 선택 버튼 + 하단 날짜 표시
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -1298,7 +1369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                         ),
-                        
+
                         // 날짜 선택 버튼들 (균등 배치)
                         Expanded(
                           child: Row(
@@ -1310,16 +1381,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: GestureDetector(
                                   onTap: () => _changeDate(-1),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: null, // 강조 표시 없음
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     alignment: Alignment.center,
                                     child: Text(
-                                      getDayLabel(_selectedDate.subtract(const Duration(days: 1))).isNotEmpty
-                                          ? getDayLabel(_selectedDate.subtract(const Duration(days: 1)))
-                                          : getWeekday(_selectedDate.subtract(const Duration(days: 1))),
+                                      getDayLabel(
+                                            _selectedDate.subtract(
+                                              const Duration(days: 1),
+                                            ),
+                                          ).isNotEmpty
+                                          ? getDayLabel(
+                                              _selectedDate.subtract(
+                                                const Duration(days: 1),
+                                              ),
+                                            )
+                                          : getWeekday(
+                                              _selectedDate.subtract(
+                                                const Duration(days: 1),
+                                              ),
+                                            ),
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
@@ -1329,9 +1415,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
-                              
+
                               const SizedBox(width: 8),
-                              
+
                               // 가운데 버튼 (현재 선택된 날짜) - 항상 강조, 고정 너비
                               SizedBox(
                                 width: 70,
@@ -1344,7 +1430,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     _loadTodayExercises();
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.white, // 항상 강조
                                       borderRadius: BorderRadius.circular(20),
@@ -1363,25 +1452,40 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
-                              
+
                               const SizedBox(width: 8),
-                              
+
                               // 오른쪽 버튼 (다음날) - 고정 너비
                               SizedBox(
                                 width: 70,
                                 child: GestureDetector(
                                   onTap: () => _changeDate(1),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: null, // 강조 표시 없음
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     alignment: Alignment.center,
                                     child: Text(
-                                      getDayLabel(_selectedDate.add(const Duration(days: 1))).isNotEmpty
-                                          ? getDayLabel(_selectedDate.add(const Duration(days: 1)))
-                                          : getWeekday(_selectedDate.add(const Duration(days: 1))),
+                                      getDayLabel(
+                                            _selectedDate.add(
+                                              const Duration(days: 1),
+                                            ),
+                                          ).isNotEmpty
+                                          ? getDayLabel(
+                                              _selectedDate.add(
+                                                const Duration(days: 1),
+                                              ),
+                                            )
+                                          : getWeekday(
+                                              _selectedDate.add(
+                                                const Duration(days: 1),
+                                              ),
+                                            ),
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
@@ -1394,7 +1498,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-                        
+
                         // 다음 날짜 버튼
                         IconButton(
                           onPressed: () => _changeDate(1),
@@ -1406,62 +1510,61 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  
+
                   // 하단: 날짜 표시
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                      child: Row(
-                        children: [
-                          // 좌측 화살표 공간 (투명)
-                          const SizedBox(width: 40),
-                          
-                          // 날짜 영역
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                // 어제 날짜
-                                Text(
-                                  '${formatDate(_selectedDate.subtract(const Duration(days: 1)))} (${getWeekday(_selectedDate.subtract(const Duration(days: 1)))})',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.white.withOpacity(0.7),
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                    child: Row(
+                      children: [
+                        // 좌측 화살표 공간 (투명)
+                        const SizedBox(width: 40),
+
+                        // 날짜 영역
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              // 어제 날짜
+                              Text(
+                                '${formatDate(_selectedDate.subtract(const Duration(days: 1)))} (${getWeekday(_selectedDate.subtract(const Duration(days: 1)))})',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontWeight: FontWeight.w400,
                                 ),
-                                
-                                // 오늘 날짜
-                                Text(
-                                  '${formatDate(_selectedDate)} (${getWeekday(_selectedDate)})',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              ),
+
+                              // 오늘 날짜
+                              Text(
+                                '${formatDate(_selectedDate)} (${getWeekday(_selectedDate)})',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                
-                                // 내일 날짜
-                                Text(
-                                  '${formatDate(_selectedDate.add(const Duration(days: 1)))} (${getWeekday(_selectedDate.add(const Duration(days: 1)))})',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.white.withOpacity(0.7),
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                              ),
+
+                              // 내일 날짜
+                              Text(
+                                '${formatDate(_selectedDate.add(const Duration(days: 1)))} (${getWeekday(_selectedDate.add(const Duration(days: 1)))})',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontWeight: FontWeight.w400,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
+                        ),
                         // 우측 화살표 공간 (투명)
                         const SizedBox(width: 40),
                       ],
                     ),
                   ),
                 ],
-                ),
               ),
-            
-            
+            ),
+
             // 하단 여백
             const SizedBox(height: 12),
           ],
@@ -1612,59 +1715,77 @@ class _HomeScreenState extends State<HomeScreen> {
                       // 칼로리바 + 탄단지
                       Expanded(
                         child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // 목표 칼로리
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    '목표 칼로리',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '$_netCalories / $_targetCalories kcal',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              // 칼로리 진행 바
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: SizedBox(
-                                  width: 270,
-                                  child: LinearProgressIndicator(
-                                    value: (_netCalories / _targetCalories).clamp(0.0, 1.0),
-                                    minHeight: 6,
-                                    backgroundColor: Colors.grey[200],
-                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF1DB954)),
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // 목표 칼로리
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  '목표 칼로리',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black87,
                                   ),
                                 ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '$_netCalories / $_targetCalories kcal',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            // 칼로리 진행 바
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: SizedBox(
+                                width: 270,
+                                child: LinearProgressIndicator(
+                                  value: (_netCalories / _targetCalories).clamp(
+                                    0.0,
+                                    1.0,
+                                  ),
+                                  minHeight: 6,
+                                  backgroundColor: Colors.grey[200],
+                                  valueColor:
+                                      const AlwaysStoppedAnimation<Color>(
+                                        Color(0xFF1DB954),
+                                      ),
+                                ),
                               ),
-                              const SizedBox(height: 8),
-                              // 탄단지 표시
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _buildNutrientInfoCompact('탄', _totalCarbs, Colors.orange),
-                                  const SizedBox(width: 12),
-                                  _buildNutrientInfoCompact('단', _totalProtein, Colors.red),
-                                  const SizedBox(width: 12),
-                                  _buildNutrientInfoCompact('지', _totalFat, Colors.blue),
-                                ],
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 8),
+                            // 탄단지 표시
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildNutrientInfoCompact(
+                                  '탄',
+                                  _totalCarbs,
+                                  Colors.orange,
+                                ),
+                                const SizedBox(width: 12),
+                                _buildNutrientInfoCompact(
+                                  '단',
+                                  _totalProtein,
+                                  Colors.red,
+                                ),
+                                const SizedBox(width: 12),
+                                _buildNutrientInfoCompact(
+                                  '지',
+                                  _totalFat,
+                                  Colors.blue,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                       // 우측: 상세 버튼
                       InkWell(
@@ -1675,7 +1796,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                             return;
                           }
-                          
+
                           await showDialog(
                             context: context,
                             builder: (context) => CalorieDetailPopup(
@@ -1686,7 +1807,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               onCalorieGoalUpdated: () {
                                 _loadUserInfo();
                               },
-                              breakfastCalories: _calculateMealCalories('BREAKFAST'),
+                              breakfastCalories: _calculateMealCalories(
+                                'BREAKFAST',
+                              ),
                               lunchCalories: _calculateMealCalories('LUNCH'),
                               dinnerCalories: _calculateMealCalories('DINNER'),
                               snackCalories: _calculateMealCalories('SNACK'),
@@ -1709,7 +1832,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -1742,9 +1868,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey[200]!),
-                ),
+                border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1764,7 +1888,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       title == '운동'
                           ? ElevatedButton.icon(
                               onPressed: () async {
-                                final result = await Navigator.pushNamed(context, '/exercise/add');
+                                final result = await Navigator.pushNamed(
+                                  context,
+                                  '/exercise/add',
+                                );
                                 if (result != null) {
                                   await _loadTodayExercises();
                                   if (mounted) {
@@ -1783,7 +1910,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF1DB954),
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -1795,7 +1925,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               label: const Text('추가'),
                               style: TextButton.styleFrom(
                                 foregroundColor: const Color(0xFF1DB954),
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 6,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -1803,7 +1936,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 2),
                 ],
               ),
@@ -1813,7 +1946,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   // 영양소 정보 위젯
   Widget _buildNutrientInfo(String label, double value, Color color) {
     return Column(
@@ -1838,7 +1971,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
-  
+
   // 영양소 정보 위젯 (컴팩트 버전)
   Widget _buildNutrientInfoCompact(String label, double value, Color color) {
     return Row(
@@ -1877,30 +2010,84 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const NeverScrollableScrollPhysics(),
         childAspectRatio: 0.85,
         children: [
-          _buildMealCard('breakfast', '아침', '🌅'),
-          _buildMealCard('lunch', '점심', '🌞'),
-          _buildMealCard('dinner', '저녁', '🌙'),
-          _buildMealCard('snack', '간식', '🍎'),
+          _buildMealCard('breakfast', '아침', 'icons_ui/breakfast.svg'),
+          _buildMealCard('lunch', '점심', 'icons_ui/lunch.svg'),
+          _buildMealCard('dinner', '저녁', 'icons_ui/dinner.svg'),
+          _buildMealCard('snack', '간식', 'icons_ui/snack.svg'),
         ],
       ),
     );
   }
 
   // 식사 카드 빌드 (DB 연동 버전)
-  Widget _buildMealCard(String type, String title, String emoji) {
+  Widget _buildMealCard(String type, String title, String iconPath) {
     // 해당 식사 유형의 식단 필터링 (소문자를 대문자로 변환)
     final mealType = type.toUpperCase();
-    final mealLogs = _todayMeals.where((meal) => meal.mealType == mealType).toList();
-    
+    final mealLogs = _todayMeals
+        .where((meal) => meal.mealType == mealType)
+        .toList();
+
     // 가장 최근 식단만 선택 (여러 개 있을 경우)
-    final latestMeal = mealLogs.isNotEmpty 
+    final latestMeal = mealLogs.isNotEmpty
         ? mealLogs.reduce((a, b) => a.createdAt!.isAfter(b.createdAt!) ? a : b)
         : null;
-    
+
     final totalCalories = latestMeal?.totalCalories.toInt() ?? 0;
     final hasMeal = latestMeal != null;
 
-    return Container(
+    return GestureDetector(
+      // 길게 누르기로 삭제 메뉴 표시
+      onLongPress: hasMeal
+          ? () async {
+              final result = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('$title 식단 삭제'),
+                  content: const Text('이 식단을 삭제하시겠습니까?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('취소'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      child: const Text('삭제'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (result == true && latestMeal.mealLogId != null) {
+                try {
+                  // 식단 삭제 API 호출
+                  final user = await _authService.getCurrentUser();
+                  if (user != null && user.memberId != null) {
+                    await _mealService.deleteMeal(
+                      latestMeal.mealLogId!,
+                      user.memberId!,
+                    );
+                    await _loadTodayMeals();
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('$title 식단이 삭제되었습니다')),
+                      );
+                    }
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('식단 삭제 실패: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              }
+            }
+          : null,
+      child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -1938,11 +2125,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.black87,
                     ),
                   ),
-                  Text(emoji, style: const TextStyle(fontSize: 16)),
+                  SvgPicture.asset(
+                    iconPath,
+                    width: 20,
+                    height: 20,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFF1DB954),
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ],
               ),
             ),
-            
+
             // 콘텐츠 영역
             Expanded(
               child: Padding(
@@ -1958,118 +2153,142 @@ class _HomeScreenState extends State<HomeScreen> {
                       // 상단: 식단 추가 버튼 또는 추가 완료 표시
                       Expanded(
                         child: InkWell(
-                          onTap: !hasMeal && _fastingStatus[type] != true ? () async {
-                            final result = await Navigator.pushNamed(
-                              context, 
-                              '/meal/camera',
-                              arguments: {
-                                'mealType': title, // 한글 식사 유형 전달 (아침/점심/저녁/간식)
-                                'selectedDate': _selectedDate,
-                              }, // 선택한 식사 유형과 날짜 전달
-                            );
-                            
-                            // 직접 입력 완료 시 새로고침
-                            if (result == true) {
-                              await _loadTodayMeals();
-                              return;
-                            }
+                          onTap: !hasMeal && _fastingStatus[type] != true
+                              ? () async {
+                                  final result = await Navigator.pushNamed(
+                                    context,
+                                    '/meal/camera',
+                                    arguments: {
+                                      'mealType':
+                                          title, // 한글 식사 유형 전달 (아침/점심/저녁/간식)
+                                      'selectedDate': _selectedDate,
+                                    }, // 선택한 식사 유형과 날짜 전달
+                                  );
 
-                            // AI 분석 결과 데이터를 받아서 DB에 저장
-                            if (result != null && result is Map<String, dynamic>) {
-                              print('홈 화면에서 받은 AI 분석 결과: $result'); // 디버깅용
-                              
-                              try {
-                                // MealType enum 변환
-                                String mealTypeEnum;
-                                switch (title) {
-                                  case '아침':
-                                    mealTypeEnum = 'BREAKFAST';
-                                    break;
-                                  case '점심':
-                                    mealTypeEnum = 'LUNCH';
-                                    break;
-                                  case '저녁':
-                                    mealTypeEnum = 'DINNER';
-                                    break;
-                                  case '간식':
-                                    mealTypeEnum = 'SNACK';
-                                    break;
-                                  default:
-                                    mealTypeEnum = 'BREAKFAST';
+                                  // 직접 입력 완료 시 새로고침
+                                  if (result == true) {
+                                    await _loadTodayMeals();
+                                    return;
+                                  }
+
+                                  // AI 분석 결과 데이터를 받아서 DB에 저장
+                                  if (result != null &&
+                                      result is Map<String, dynamic>) {
+                                    print(
+                                      '홈 화면에서 받은 AI 분석 결과: $result',
+                                    ); // 디버깅용
+
+                                    try {
+                                      // MealType enum 변환
+                                      String mealTypeEnum;
+                                      switch (title) {
+                                        case '아침':
+                                          mealTypeEnum = 'BREAKFAST';
+                                          break;
+                                        case '점심':
+                                          mealTypeEnum = 'LUNCH';
+                                          break;
+                                        case '저녁':
+                                          mealTypeEnum = 'DINNER';
+                                          break;
+                                        case '간식':
+                                          mealTypeEnum = 'SNACK';
+                                          break;
+                                        default:
+                                          mealTypeEnum = 'BREAKFAST';
+                                      }
+
+                                      // MealItem 생성
+                                      final mealItem = MealItem(
+                                        mealLogId: 0,
+                                        foodName: result['name'] as String,
+                                        caloriesKcal:
+                                            (result['calories'] as int)
+                                                .toDouble(),
+                                        carbohydratesG:
+                                            result['carbs'] as double,
+                                        proteinG: result['protein'] as double,
+                                        fatG: result['fat'] as double,
+                                        sugarG: result['sugar'] as double,
+                                        sodiumMg: result['sodium'] as double,
+                                      );
+
+                                      // MealLog 생성
+                                      final mealLog = MealLog(
+                                        memberId: _currentUser!.memberId,
+                                        mealDate: _selectedDate,
+                                        mealType: mealTypeEnum,
+                                        items: [mealItem],
+                                      );
+
+                                      // DB에 저장
+                                      print(
+                                        'DB 저장 시도: ${mealLog.toJson()}',
+                                      ); // 디버깅용
+                                      final savedMeal = await _mealService
+                                          .createMeal(mealLog);
+                                      if (savedMeal == null) {
+                                        throw Exception('식단 저장에 실패했습니다');
+                                      }
+                                      print('DB 저장 완료: $savedMeal'); // 디버깅용
+
+                                      // 단식 상태를 OFF로 변경하고 데이터 새로고침
+                                      setState(() {
+                                        _fastingStatus[type] = false;
+                                      });
+                                      print('DB에서 데이터 새로고침 시작'); // 디버깅용
+                                      await _loadTodayMeals();
+                                      print(
+                                        'DB에서 데이터 새로고침 완료: ${_todayMeals.length}개 식단',
+                                      ); // 디버깅용
+
+                                      // 사용자에게 피드백
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text('$title 식단이 추가되었습니다'),
+                                            backgroundColor: const Color(
+                                              0xFF1DB954,
+                                            ),
+                                            duration: const Duration(
+                                              seconds: 2,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      print('식단 저장 중 오류 발생: $e'); // 디버깅용
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text('식단 저장 실패: $e'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  }
                                 }
-                                
-                                // MealItem 생성
-                                final mealItem = MealItem(
-                                  mealLogId: 0,
-                                  foodName: result['name'] as String,
-                                  caloriesKcal: (result['calories'] as int).toDouble(),
-                                  carbohydratesG: result['carbs'] as double,
-                                  proteinG: result['protein'] as double,
-                                  fatG: result['fat'] as double,
-                                  sugarG: result['sugar'] as double,
-                                  sodiumMg: result['sodium'] as double,
-                                );
-                                
-                                // MealLog 생성
-                                final mealLog = MealLog(
-                                  memberId: _currentUser!.memberId,
-                                  mealDate: _selectedDate,
-                                  mealType: mealTypeEnum,
-                                  items: [mealItem],
-                                );
-                                
-                                // DB에 저장
-                                print('DB 저장 시도: ${mealLog.toJson()}'); // 디버깅용
-                                final savedMeal = await _mealService.createMeal(mealLog);
-                                if (savedMeal == null) {
-                                  throw Exception('식단 저장에 실패했습니다');
-                                }
-                                print('DB 저장 완료: $savedMeal'); // 디버깅용
-                                
-                                // 단식 상태를 OFF로 변경하고 데이터 새로고침
-                                setState(() {
-                                  _fastingStatus[type] = false;
-                                });
-                                print('DB에서 데이터 새로고침 시작'); // 디버깅용
-                                await _loadTodayMeals();
-                                print('DB에서 데이터 새로고침 완료: ${_todayMeals.length}개 식단'); // 디버깅용
-                                
-                                // 사용자에게 피드백
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('$title 식단이 추가되었습니다'),
-                                      backgroundColor: const Color(0xFF1DB954),
-                                      duration: const Duration(seconds: 2),
+                              : hasMeal
+                              ? () async {
+                                  // 식단 수정 팝업 표시
+                                  await showDialog(
+                                    context: context,
+                                    builder: (context) => MealEditPopup(
+                                      mealLog: latestMeal,
+                                      onUpdated: () async {
+                                        await _loadTodayMeals();
+                                      },
                                     ),
                                   );
-                                }
-                              } catch (e) {
-                                print('식단 저장 중 오류 발생: $e'); // 디버깅용
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('식단 저장 실패: $e'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              }
-                            }
-                          } : hasMeal ? () async {
-                            // 식단 수정 팝업 표시
-                            await showDialog(
-                              context: context,
-                              builder: (context) => MealEditPopup(
-                                mealLog: latestMeal,
-                                onUpdated: () async {
+                                  // 팝업 닫힌 후 새로고침
                                   await _loadTodayMeals();
-                                },
-                              ),
-                            );
-                            // 팝업 닫힌 후 새로고침
-                            await _loadTodayMeals();
-                          } : null,
+                                }
+                              : null,
                           child: Container(
                             child: !hasMeal
                                 ? Row(
@@ -2079,14 +2298,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                         '식단 추가',
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: _fastingStatus[type] == true ? Colors.grey[400] : Colors.grey[700],
+                                          color: _fastingStatus[type] == true
+                                              ? Colors.grey[400]
+                                              : Colors.grey[700],
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                       const SizedBox(width: 8),
                                       Icon(
                                         Icons.add_circle_outline,
-                                        color: _fastingStatus[type] == true ? Colors.grey[400] : const Color(0xFF1DB954),
+                                        color: _fastingStatus[type] == true
+                                            ? Colors.grey[400]
+                                            : const Color(0xFF1DB954),
                                         size: 20,
                                       ),
                                     ],
@@ -2113,25 +2336,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 8),
-                      
+
                       // 경계선
-                      Divider(
-                        color: Colors.grey[300],
-                        thickness: 1,
-                        height: 1,
-                      ),
-                      
+                      Divider(color: Colors.grey[300], thickness: 1, height: 1),
+
                       const SizedBox(height: 8),
-                      
+
                       // 하단: 단식 체크 버튼 또는 칼로리 표시
                       if (!hasMeal)
                         // 단식했어요 체크 버튼
                         InkWell(
                           onTap: () {
                             setState(() {
-                              _fastingStatus[type] = !(_fastingStatus[type] ?? false);
+                              _fastingStatus[type] =
+                                  !(_fastingStatus[type] ?? false);
                             });
                             if (_fastingStatus[type] == true) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -2146,7 +2366,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
-                              color: _fastingStatus[type] == true ? const Color(0xFF1DB954) : Colors.transparent,
+                              color: _fastingStatus[type] == true
+                                  ? const Color(0xFF1DB954)
+                                  : Colors.transparent,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -2156,15 +2378,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                   '단식했어요',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: _fastingStatus[type] == true ? Colors.white : Colors.grey[700],
+                                    color: _fastingStatus[type] == true
+                                        ? Colors.white
+                                        : Colors.grey[700],
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                
+
                                 Icon(
-                                  _fastingStatus[type] == true ? Icons.check_circle : Icons.check_outlined,
+                                  _fastingStatus[type] == true
+                                      ? Icons.check_circle
+                                      : Icons.check_outlined,
                                   size: 18,
-                                  color: _fastingStatus[type] == true ? Colors.white : Colors.grey[600],
+                                  color: _fastingStatus[type] == true
+                                      ? Colors.white
+                                      : Colors.grey[600],
                                 ),
                               ],
                             ),
@@ -2191,7 +2419,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      );
+      ),
+    );
   }
 
   // 운동 콘텐츠 빌드 (DB 연동 버전)
@@ -2201,17 +2430,18 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           // 로딩 중
           if (_isLoadingExercises)
             const Center(child: CircularProgressIndicator())
-          
           // 운동 기록이 없을 때
           else if (_todayExercises.isEmpty)
             GestureDetector(
               onTap: () async {
                 // 운동 추가 화면으로 이동
-                final result = await Navigator.pushNamed(context, '/exercise/add');
+                final result = await Navigator.pushNamed(
+                  context,
+                  '/exercise/add',
+                );
                 if (result != null) {
                   await _loadTodayExercises();
                   if (mounted) {
@@ -2235,39 +2465,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: const Center(
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.fitness_center,
-                        size: 48,
-                        color: Colors.grey,
-                      ),
+                      Icon(Icons.fitness_center, size: 48, color: Colors.grey),
                       SizedBox(height: 12),
                       Text(
                         '아직 기록된 운동이 없습니다',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 15, color: Colors.grey),
                       ),
                       SizedBox(height: 4),
                       Text(
                         '운동 기록을 추가해보세요!',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 13, color: Colors.grey),
                       ),
                     ],
                   ),
                 ),
               ),
             )
-          
           // 운동 기록이 있을 때 (DB 데이터)
           else ...[
             // 운동 추가 버튼
             GestureDetector(
               onTap: () async {
-                final result = await Navigator.pushNamed(context, '/exercise/add');
+                final result = await Navigator.pushNamed(
+                  context,
+                  '/exercise/add',
+                );
                 if (result != null) {
                   await _loadTodayExercises();
                   if (mounted) {
@@ -2287,7 +2509,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF1DB954), width: 1.5),
+                  border: Border.all(
+                    color: const Color(0xFF1DB954),
+                    width: 1.5,
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -2310,70 +2535,162 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            
-            ..._todayExercises.map((exercise) {
-              return GestureDetector(
-                onTap: () => _showDeleteExerciseDialog(exercise),
-                child: Container(
+
+            ..._todayExercises.asMap().entries.map((entry) {
+              final index = entry.key;
+              final exercise = entry.value;
+              return Dismissible(
+                key: Key(
+                  'exercise_${exercise.exerciseLogId}_${exercise.createdAt}',
+                ),
+                direction: DismissDirection.endToStart,
+                background: Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.red,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey[200]!),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  alignment: Alignment.centerRight,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  exercise.exerciseName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  exercise.durationFormatted,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // 소모된 칼로리 수치
-                          Text(
-                            exercise.caloriesFormatted,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFFFF6B6B),
-                            ),
-                          ),
-                        ],
+                      Icon(Icons.delete, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        '삭제',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      if (exercise.memo != null && exercise.memo!.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          exercise.memo!,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
+                    ],
+                  ),
+                ),
+                confirmDismiss: (direction) async {
+                  return await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('운동 기록 삭제'),
+                      content: Text('${exercise.exerciseName} 기록을 삭제하시겠습니까?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('취소'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.red,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                          child: const Text('삭제'),
                         ),
                       ],
-                    ],
+                    ),
+                  );
+                },
+                onDismissed: (direction) async {
+                  try {
+                    final user = await _authService.getCurrentUser();
+                    if (user != null &&
+                        user.memberId != null &&
+                        exercise.exerciseLogId != null) {
+                      await _exerciseService.deleteExercise(
+                        exercise.exerciseLogId!,
+                        user.memberId!,
+                      );
+                      await _loadTodayExercises();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${exercise.exerciseName} 기록이 삭제되었습니다',
+                            ),
+                            action: SnackBarAction(
+                              label: '취소',
+                              onPressed: () {
+                                // 실제로는 서버 API 복구 필요
+                              },
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('운동 기록 삭제 실패: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: GestureDetector(
+                  onTap: () => _showDeleteExerciseDialog(exercise),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    exercise.exerciseName,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    exercise.durationFormatted,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // 소모된 칼로리 수치
+                            Text(
+                              exercise.caloriesFormatted,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFFF6B6B),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (exercise.memo != null &&
+                            exercise.memo!.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            exercise.memo!,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -2394,7 +2711,6 @@ class _HomeScreenState extends State<HomeScreen> {
           // 로딩 중
           if (_isLoadingGroups)
             const Center(child: CircularProgressIndicator())
-          
           // 그룹이 없을 때
           else if (_myGroups.isEmpty)
             GestureDetector(
@@ -2409,11 +2725,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Center(
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.group_add,
-                        size: 60,
-                        color: Colors.grey[300],
-                      ),
+                      Icon(Icons.group_add, size: 60, color: Colors.grey[300]),
                       const SizedBox(height: 16),
                       Text(
                         '그룹이 없습니다',
@@ -2426,10 +2738,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 8),
                       Text(
                         '친구들과 함께하는 그룹을 만들어보세요',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                       ),
                     ],
                   ),
@@ -2446,12 +2755,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   final group = _myGroups[index];
                   final isSelected = _selectedGroup?.groupId == group.groupId;
                   return Container(
-                    margin: EdgeInsets.only(right: index == _myGroups.length - 1 ? 0 : 12),
+                    margin: EdgeInsets.only(
+                      right: index == _myGroups.length - 1 ? 0 : 12,
+                    ),
                     child: InkWell(
                       onTap: () => _selectGroup(group),
                       borderRadius: BorderRadius.circular(8),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? const Color(0xFF1DB954).withOpacity(0.08)
@@ -2473,7 +2787,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
                                 color: isSelected
                                     ? const Color(0xFF1DB954)
                                     : Colors.black87,
@@ -2519,9 +2835,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 8),
                     TextButton(
-                      onPressed: () => _loadGroupMembers(_selectedGroup!.groupId),
+                      onPressed: () =>
+                          _loadGroupMembers(_selectedGroup!.groupId),
                       child: const Text('다시 시도'),
-                    )
+                    ),
                   ],
                 ),
               )
@@ -2544,7 +2861,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: _selectedGroupMembers.map((member) {
                   return Dismissible(
-                    key: ValueKey('group_${_selectedGroup!.groupId}_member_${member.memberId}'),
+                    key: ValueKey(
+                      'group_${_selectedGroup!.groupId}_member_${member.memberId}',
+                    ),
                     direction: DismissDirection.endToStart,
                     background: Container(
                       margin: const EdgeInsets.only(bottom: 10),
@@ -2569,7 +2888,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              style: TextButton.styleFrom(foregroundColor: Colors.red),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.red,
+                              ),
                               child: const Text('삭제'),
                             ),
                           ],
@@ -2578,7 +2899,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       return result ?? false;
                     },
                     onDismissed: (_) {
-                      _removeGroupMember(_selectedGroup!.groupId, member.memberId);
+                      _removeGroupMember(
+                        _selectedGroup!.groupId,
+                        member.memberId,
+                      );
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 10),
@@ -2625,7 +2949,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(
                                 Icons.chevron_right,
                                 color: Colors.grey[400],
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -2639,5 +2963,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 }

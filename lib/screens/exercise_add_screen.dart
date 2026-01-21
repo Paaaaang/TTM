@@ -6,12 +6,7 @@ import 'package:ttm/services/auth_service.dart';
 import 'package:ttm/models/exercise_log.dart';
 
 /// 운동 카테고리
-enum ExerciseCategory {
-  cardio,
-  strength,
-  flexibility,
-  sports,
-}
+enum ExerciseCategory { cardio, strength, flexibility, sports }
 
 /// 운동 항목 모델
 class Exercise {
@@ -140,7 +135,9 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
   List<Exercise> get _filteredExercises {
     if (_searchQuery.isEmpty) return _exerciseDatabase;
     return _exerciseDatabase
-        .where((ex) => ex.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where(
+          (ex) => ex.name.toLowerCase().contains(_searchQuery.toLowerCase()),
+        )
         .toList();
   }
 
@@ -148,6 +145,7 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
+      resizeToAvoidBottomInset: true, // 키보드가 올라올 때 자동으로 화면 조정
       appBar: AppBar(
         title: const Text('운동 추가'),
         backgroundColor: Colors.blue,
@@ -200,7 +198,10 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
@@ -301,10 +302,7 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
                       ),
                       Text(
                         _getCategoryName(exercise.category),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -337,7 +335,10 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.blue[50],
                       borderRadius: BorderRadius.circular(20),
@@ -430,7 +431,8 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
       for (var exercise in _selectedExercises) {
         // 운동 시간을 분 단위로 변환
         final durationStr = exercise['duration'] as String; // 예: "10분", "20분"
-        final durationMinutes = int.tryParse(durationStr.replaceAll('분', '')) ?? 0;
+        final durationMinutes =
+            int.tryParse(durationStr.replaceAll('분', '')) ?? 0;
 
         final exerciseLog = ExerciseLog(
           memberId: currentUser.memberId,

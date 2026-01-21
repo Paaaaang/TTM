@@ -25,9 +25,10 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _phone2Controller = TextEditingController();
   final TextEditingController _phone3Controller = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfirmController = TextEditingController();
+  final TextEditingController _passwordConfirmController =
+      TextEditingController();
   final AuthService _authService = AuthService();
-  
+
   // FocusNode for auto-focus
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _nicknameFocus = FocusNode();
@@ -37,24 +38,25 @@ class _SignupScreenState extends State<SignupScreen> {
   final FocusNode _phone2Focus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _passwordConfirmFocus = FocusNode();
-  
+
   bool _showPassword = false;
   bool _showPasswordConfirm = false;
   bool _isLoading = false;
-  
+
   // 핸드폰 번호 앞자리
   String _phonePrefix = '010';
-  
+
   // 이메일 도메인 (@ 없이)
   String _emailDomain = 'naver.com';
   bool _isCustomEmailDomain = false; // 직접입력 모드
-  final TextEditingController _customEmailDomainController = TextEditingController();
-  
+  final TextEditingController _customEmailDomainController =
+      TextEditingController();
+
   // 생년월일 선택
   int? _selectedYear;
   int? _selectedMonth;
   int? _selectedDay;
-  
+
   // 중복 확인 상태
   bool _nicknameChecked = false;
   bool _nicknameAvailable = false;
@@ -62,18 +64,18 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _usernameChecked = false;
   bool _usernameAvailable = false;
   bool _hasUsernameInput = false;
-  
+
   // 비밀번호 강도 체크
   bool _hasMinLength = false;
   bool _hasUppercase = false;
   bool _hasLowercase = false;
   bool _hasDigit = false;
   bool _hasSpecialChar = false;
-  
+
   // 비밀번호 확인 일치 여부
   bool _passwordConfirmChecked = false;
   bool _passwordsMatch = false;
-  
+
   // 약관 동의 상태
   bool _agreeAll = false;
   bool _agreeTerms = false;
@@ -131,7 +133,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _phone3Controller.dispose();
     _passwordController.dispose();
     _passwordConfirmController.dispose();
-    
+
     _nameFocus.dispose();
     _nicknameFocus.dispose();
     _usernameFocus.dispose();
@@ -147,6 +149,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true, // 키보드가 올라올 때 자동으로 화면 조정
       body: Stack(
         children: [
           SafeArea(
@@ -162,7 +165,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.arrow_back, size: 20, color: Colors.black54),
+                          const Icon(
+                            Icons.arrow_back,
+                            size: 20,
+                            color: Colors.black54,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             '뒤로',
@@ -251,7 +258,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           onCheckPressed: _checkUsernameDuplicate,
                           onSubmitted: (_) => _emailLocalFocus.requestFocus(),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_-]')),
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'[a-zA-Z0-9_-]'),
+                            ),
                           ],
                           message: _usernameAvailable
                               ? '✓ 사용 가능한 아이디입니다'
@@ -259,7 +268,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
 
                         const SizedBox(height: 20),
-                        
+
                         // 이메일 입력
                         const FormLabel('이메일'),
                         const SizedBox(height: 8),
@@ -293,15 +302,20 @@ class _SignupScreenState extends State<SignupScreen> {
                                       controller: _customEmailDomainController,
                                       hintText: 'example.com',
                                       keyboardType: TextInputType.emailAddress,
-                                      onSubmitted: (_) => _phone1Focus.requestFocus(),
+                                      onSubmitted: (_) =>
+                                          _phone1Focus.requestFocus(),
                                     )
                                   : Container(
                                       height: 48,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: Colors.grey[100],
                                         borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.grey[300]!),
+                                        border: Border.all(
+                                          color: Colors.grey[300]!,
+                                        ),
                                       ),
                                       alignment: Alignment.centerLeft,
                                       child: Text(
@@ -328,21 +342,28 @@ class _SignupScreenState extends State<SignupScreen> {
                             child: DropdownButton<String>(
                               value: _emailDomain,
                               isExpanded: true,
-                              icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
-                              items: [
-                                'naver.com',
-                                'gmail.com',
-                                'daum.net',
-                                'kakao.com',
-                                'hanmail.net',
-                                'nate.com',
-                                '직접입력',
-                              ].map((domain) {
-                                return DropdownMenuItem<String>(
-                                  value: domain,
-                                  child: Text(domain, style: const TextStyle(fontSize: 14)),
-                                );
-                              }).toList(),
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.grey[600],
+                              ),
+                              items:
+                                  [
+                                    'naver.com',
+                                    'gmail.com',
+                                    'daum.net',
+                                    'kakao.com',
+                                    'hanmail.net',
+                                    'nate.com',
+                                    '직접입력',
+                                  ].map((domain) {
+                                    return DropdownMenuItem<String>(
+                                      value: domain,
+                                      child: Text(
+                                        domain,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    );
+                                  }).toList(),
                               onChanged: (value) {
                                 setState(() {
                                   _emailDomain = value!;
@@ -371,7 +392,9 @@ class _SignupScreenState extends State<SignupScreen> {
                               width: 80,
                               child: Container(
                                 height: 48,
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.grey[50],
                                   borderRadius: BorderRadius.circular(8),
@@ -382,13 +405,24 @@ class _SignupScreenState extends State<SignupScreen> {
                                     child: DropdownButton<String>(
                                       value: _phonePrefix,
                                       isExpanded: true,
-                                      icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
-                                      items: ['010', '011', '016', '017', '018', '019'].map((prefix) {
-                                        return DropdownMenuItem<String>(
-                                          value: prefix,
-                                          child: Text(prefix),
-                                        );
-                                      }).toList(),
+                                      icon: Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Colors.grey[600],
+                                      ),
+                                      items:
+                                          [
+                                            '010',
+                                            '011',
+                                            '016',
+                                            '017',
+                                            '018',
+                                            '019',
+                                          ].map((prefix) {
+                                            return DropdownMenuItem<String>(
+                                              value: prefix,
+                                              child: Text(prefix),
+                                            );
+                                          }).toList(),
                                       onChanged: (value) {
                                         setState(() => _phonePrefix = value!);
                                       },
@@ -401,7 +435,13 @@ class _SignupScreenState extends State<SignupScreen> {
                             // 하이픈
                             const Padding(
                               padding: EdgeInsets.only(bottom: 8),
-                              child: Text('-', style: TextStyle(fontSize: 20, color: Colors.grey)),
+                              child: Text(
+                                '-',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.grey,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 8),
                             // 중간 4자리
@@ -418,9 +458,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                 ],
                                 onChanged: (value) {
                                   if (value.length == 4) {
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      _phone2Focus.requestFocus();
-                                    });
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                          _phone2Focus.requestFocus();
+                                        });
                                   }
                                 },
                                 onSubmitted: (_) => _phone2Focus.requestFocus(),
@@ -430,7 +471,13 @@ class _SignupScreenState extends State<SignupScreen> {
                             // 하이픈
                             const Padding(
                               padding: EdgeInsets.only(bottom: 8),
-                              child: Text('-', style: TextStyle(fontSize: 20, color: Colors.grey)),
+                              child: Text(
+                                '-',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.grey,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 8),
                             // 마지막 4자리
@@ -445,7 +492,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                   FilteringTextInputFormatter.digitsOnly,
                                   LengthLimitingTextInputFormatter(4),
                                 ],
-                                onSubmitted: (_) => _passwordFocus.requestFocus(),
+                                onSubmitted: (_) =>
+                                    _passwordFocus.requestFocus(),
                               ),
                             ),
                           ],
@@ -474,8 +522,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: CustomDropdown
-                               (
+                              child: CustomDropdown(
                                 value: _selectedMonth,
                                 hint: '월',
                                 items: List.generate(12, (index) => index + 1),
@@ -508,13 +555,16 @@ class _SignupScreenState extends State<SignupScreen> {
                           hintText: '비밀번호 입력',
                           focusNode: _passwordFocus,
                           obscureText: !_showPassword,
-                          onSubmitted: (_) => _passwordConfirmFocus.requestFocus(),
+                          onSubmitted: (_) =>
+                              _passwordConfirmFocus.requestFocus(),
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(50),
                           ],
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _showPassword ? Icons.visibility : Icons.visibility_off,
+                              _showPassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: Colors.grey[600],
                             ),
                             onPressed: () {
@@ -550,7 +600,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           ],
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _showPasswordConfirm ? Icons.visibility : Icons.visibility_off,
+                              _showPasswordConfirm
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: Colors.grey[600],
                             ),
                             onPressed: () {
@@ -566,16 +618,24 @@ class _SignupScreenState extends State<SignupScreen> {
                             child: Row(
                               children: [
                                 Icon(
-                                  _passwordsMatch ? Icons.check_circle : Icons.cancel,
+                                  _passwordsMatch
+                                      ? Icons.check_circle
+                                      : Icons.cancel,
                                   size: 16,
-                                  color: _passwordsMatch ? const Color(0xFF66BB6A) : Colors.red,
+                                  color: _passwordsMatch
+                                      ? AppColors.primary
+                                      : Colors.red,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  _passwordsMatch ? '비밀번호가 일치합니다!' : '비밀번호가 일치하지 않습니다',
+                                  _passwordsMatch
+                                      ? '비밀번호가 일치합니다!'
+                                      : '비밀번호가 일치하지 않습니다',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: _passwordsMatch ? const Color(0xFF66BB6A) : Colors.red,
+                                    color: _passwordsMatch
+                                        ? AppColors.primary
+                                        : Colors.red,
                                   ),
                                 ),
                               ],
@@ -641,7 +701,10 @@ class _SignupScreenState extends State<SignupScreen> {
                             setState(() {
                               _agreeKakao = value;
                               // 하나라도 체크되면 마케팅 수신동의 자동 체크
-                              if (_agreeKakao || _agreePush || _agreeSMS || _agreeEmail) {
+                              if (_agreeKakao ||
+                                  _agreePush ||
+                                  _agreeSMS ||
+                                  _agreeEmail) {
                                 _agreeMarketing = true;
                               } else {
                                 _agreeMarketing = false;
@@ -653,7 +716,10 @@ class _SignupScreenState extends State<SignupScreen> {
                             setState(() {
                               _agreePush = value;
                               // 하나라도 체크되면 마케팅 수신동의 자동 체크
-                              if (_agreeKakao || _agreePush || _agreeSMS || _agreeEmail) {
+                              if (_agreeKakao ||
+                                  _agreePush ||
+                                  _agreeSMS ||
+                                  _agreeEmail) {
                                 _agreeMarketing = true;
                               } else {
                                 _agreeMarketing = false;
@@ -665,7 +731,10 @@ class _SignupScreenState extends State<SignupScreen> {
                             setState(() {
                               _agreeSMS = value;
                               // 하나라도 체크되면 마케팅 수신동의 자동 체크
-                              if (_agreeKakao || _agreePush || _agreeSMS || _agreeEmail) {
+                              if (_agreeKakao ||
+                                  _agreePush ||
+                                  _agreeSMS ||
+                                  _agreeEmail) {
                                 _agreeMarketing = true;
                               } else {
                                 _agreeMarketing = false;
@@ -677,7 +746,10 @@ class _SignupScreenState extends State<SignupScreen> {
                             setState(() {
                               _agreeEmail = value;
                               // 하나라도 체크되면 마케팅 수신동의 자동 체크
-                              if (_agreeKakao || _agreePush || _agreeSMS || _agreeEmail) {
+                              if (_agreeKakao ||
+                                  _agreePush ||
+                                  _agreeSMS ||
+                                  _agreeEmail) {
                                 _agreeMarketing = true;
                               } else {
                                 _agreeMarketing = false;
@@ -696,7 +768,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           child: ElevatedButton(
                             onPressed: _handleSignup,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF66BB6A),
+                              backgroundColor: AppColors.primary,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -735,7 +807,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   '로그인',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Color(0xFF66BB6A),
+                                    color: AppColors.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -757,7 +829,7 @@ class _SignupScreenState extends State<SignupScreen> {
               color: Colors.black26,
               child: const Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF66BB6A)),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                 ),
               ),
             ),
@@ -768,116 +840,121 @@ class _SignupScreenState extends State<SignupScreen> {
 
   /// 전체 동의 상태 업데이트
   void _updateAgreeAll() {
-    _agreeAll = _agreeTerms && 
-                _agreePrivacy && 
-                _agreeMarketing &&
-                _agreeKakao &&
-                _agreePush &&
-                _agreeSMS &&
-                _agreeEmail;
+    _agreeAll =
+        _agreeTerms &&
+        _agreePrivacy &&
+        _agreeMarketing &&
+        _agreeKakao &&
+        _agreePush &&
+        _agreeSMS &&
+        _agreeEmail;
   }
 
   /// 이메일 중복 확인
   Future<void> _checkEmailDuplicate() async {
     final emailLocal = _emailLocalController.text.trim();
-    final domain = _isCustomEmailDomain ? _customEmailDomainController.text.trim() : _emailDomain;
+    final domain = _isCustomEmailDomain
+        ? _customEmailDomainController.text.trim()
+        : _emailDomain;
     final email = '$emailLocal@$domain';
-    
+
     if (emailLocal.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('이메일을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('이메일을 입력해주세요')));
       return;
     }
 
     if (_isCustomEmailDomain && domain.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('도메인을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('도메인을 입력해주세요')));
       return;
     }
 
     if (emailLocal.length < 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('올바른 이메일 형식이 아닙니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('올바른 이메일 형식이 아닙니다')));
       return;
     }
 
     try {
       final isDuplicate = await _authService.checkEmailDuplicate(email);
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(isDuplicate ? '이미 사용중인 이메일입니다' : '사용 가능한 이메일입니다')),
+        SnackBar(
+          content: Text(isDuplicate ? '이미 사용중인 이메일입니다' : '사용 가능한 이메일입니다'),
+        ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('이메일 확인 중 오류가 발생했습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('이메일 확인 중 오류가 발생했습니다')));
     }
   }
 
   /// 닉네임 중복 확인
   Future<void> _checkNicknameDuplicate() async {
     final nickname = _nicknameController.text.trim();
-    
+
     if (nickname.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('닉네임을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('닉네임을 입력해주세요')));
       return;
     }
 
     try {
       final isDuplicate = await _authService.checkNicknameDuplicate(nickname);
-      
+
       setState(() {
         _nicknameChecked = true;
         _nicknameAvailable = !isDuplicate;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('닉네임 확인 중 오류가 발생했습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('닉네임 확인 중 오류가 발생했습니다')));
     }
   }
 
   /// 아이디 중복 확인
   Future<void> _checkUsernameDuplicate() async {
     final username = _usernameController.text.trim();
-    
+
     if (username.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('아이디를 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('아이디를 입력해주세요')));
       return;
     }
 
     if (username.length < 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('아이디는 3자 이상이어야 합니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('아이디는 3자 이상이어야 합니다')));
       return;
     }
 
     try {
       final isDuplicate = await _authService.checkLoginIdDuplicate(username);
-      
+
       setState(() {
         _usernameChecked = true;
         _usernameAvailable = !isDuplicate;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('아이디 확인 중 오류가 발생했습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('아이디 확인 중 오류가 발생했습니다')));
     }
   }
 
   /// 비밀번호 강도 체크
   void _checkPasswordStrength() {
     final password = _passwordController.text;
-    
+
     setState(() {
       _hasMinLength = password.length >= 10;
       _hasUppercase = password.contains(RegExp(r'[A-Z]'));
@@ -891,7 +968,7 @@ class _SignupScreenState extends State<SignupScreen> {
   void _checkPasswordMatch() {
     final password = _passwordController.text;
     final passwordConfirm = _passwordConfirmController.text;
-    
+
     if (passwordConfirm.isEmpty) {
       setState(() {
         _passwordConfirmChecked = false;
@@ -899,7 +976,7 @@ class _SignupScreenState extends State<SignupScreen> {
       });
       return;
     }
-    
+
     setState(() {
       _passwordConfirmChecked = true;
       _passwordsMatch = password == passwordConfirm;
@@ -912,7 +989,9 @@ class _SignupScreenState extends State<SignupScreen> {
     final nickname = _nicknameController.text.trim();
     final username = _usernameController.text.trim();
     final emailLocal = _emailLocalController.text.trim();
-    final domain = _isCustomEmailDomain ? _customEmailDomainController.text.trim() : _emailDomain;
+    final domain = _isCustomEmailDomain
+        ? _customEmailDomainController.text.trim()
+        : _emailDomain;
     final email = '$emailLocal@$domain';
     final phone1 = _phone1Controller.text.trim();
     final phone2 = _phone2Controller.text.trim();
@@ -921,87 +1000,99 @@ class _SignupScreenState extends State<SignupScreen> {
     final passwordConfirm = _passwordConfirmController.text.trim();
 
     // 유효성 검사
-    if (name.isEmpty || nickname.isEmpty || username.isEmpty || emailLocal.isEmpty || phone1.isEmpty || phone2.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('모든 필드를 입력해주세요')),
-      );
+    if (name.isEmpty ||
+        nickname.isEmpty ||
+        username.isEmpty ||
+        emailLocal.isEmpty ||
+        phone1.isEmpty ||
+        phone2.isEmpty ||
+        password.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('모든 필드를 입력해주세요')));
       return;
     }
 
     // 도메인 입력 확인
     if (_isCustomEmailDomain && domain.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('이메일 도메인을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('이메일 도메인을 입력해주세요')));
       return;
     }
 
     // 닉네임 중복 확인
     if (!_nicknameChecked || !_nicknameAvailable) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('닉네임 중복 확인을 해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('닉네임 중복 확인을 해주세요')));
       return;
     }
 
     // 아이디 중복 확인
     if (!_usernameChecked || !_usernameAvailable) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('아이디 중복 확인을 해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('아이디 중복 확인을 해주세요')));
       return;
     }
 
     if (username.length < 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('아이디는 3자 이상이어야 합니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('아이디는 3자 이상이어야 합니다')));
       return;
     }
 
     if (emailLocal.isEmpty || emailLocal.length < 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('올바른 이메일을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('올바른 이메일을 입력해주세요')));
       return;
     }
 
     // 핸드폰 번호 검증
     if (phone1.length < 3 || phone1.length > 4 || phone2.length != 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('올바른 핸드폰 번호를 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('올바른 핸드폰 번호를 입력해주세요')));
       return;
     }
 
     // 생년월일 검증
-    if (_selectedYear == null || _selectedMonth == null || _selectedDay == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('생년월일을 선택해주세요')),
-      );
+    if (_selectedYear == null ||
+        _selectedMonth == null ||
+        _selectedDay == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('생년월일을 선택해주세요')));
       return;
     }
 
     // 비밀번호 강도 체크
-    if (!_hasMinLength || !_hasUppercase || !_hasLowercase || !_hasDigit || !_hasSpecialChar) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('비밀번호 조건을 모두 충족해주세요')),
-      );
+    if (!_hasMinLength ||
+        !_hasUppercase ||
+        !_hasLowercase ||
+        !_hasDigit ||
+        !_hasSpecialChar) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('비밀번호 조건을 모두 충족해주세요')));
       return;
     }
 
     if (password != passwordConfirm) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('비밀번호가 일치하지 않습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('비밀번호가 일치하지 않습니다')));
       return;
     }
 
     // 필수 약관 동의 확인
     if (!_agreeTerms || !_agreePrivacy) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('필수 약관에 동의해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('필수 약관에 동의해주세요')));
       return;
     }
 
@@ -1028,15 +1119,15 @@ class _SignupScreenState extends State<SignupScreen> {
           _usernameController.text.trim(),
           password,
         );
-        
+
         if (!mounted) return;
-        
+
         if (loggedInUser != null) {
           // 3. 로그인 성공 - Welcome Screen으로 이동
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('${loggedInUser.nickname}님 가입을 환영합니다!')),
           );
-          
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -1056,8 +1147,12 @@ class _SignupScreenState extends State<SignupScreen> {
       } else {
         // 회원가입 실패
         print('회원가입 실패: 닉네임=$nickname, 아이디=$username');
-        print('닉네임 중복확인: checked=$_nicknameChecked, available=$_nicknameAvailable');
-        print('아이디 중복확인: checked=$_usernameChecked, available=$_usernameAvailable');
+        print(
+          '닉네임 중복확인: checked=$_nicknameChecked, available=$_nicknameAvailable',
+        );
+        print(
+          '아이디 중복확인: checked=$_usernameChecked, available=$_usernameAvailable',
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('회원가입에 실패했습니다. 중복 확인을 다시 진행해주세요.'),
@@ -1067,9 +1162,9 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('회원가입 중 오류가 발생했습니다: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('회원가입 중 오류가 발생했습니다: $e')));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -1078,7 +1173,9 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   String get birthdate {
-    if (_selectedYear == null || _selectedMonth == null || _selectedDay == null) {
+    if (_selectedYear == null ||
+        _selectedMonth == null ||
+        _selectedDay == null) {
       return '';
     }
     return '$_selectedYear-${_selectedMonth.toString().padLeft(2, '0')}-${_selectedDay.toString().padLeft(2, '0')}';

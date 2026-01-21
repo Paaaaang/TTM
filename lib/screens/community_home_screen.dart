@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 import '../models/post.dart';
 import '../services/post_service.dart';
 import '../services/auth_service.dart';
@@ -201,7 +202,7 @@ class CommunityHomeScreenState extends State<CommunityHomeScreen> {
                       });
                       _loadPosts(forceRefresh: true);
                     },
-                    selectedColor: const Color(0xFF66BB6A),
+                    selectedColor: AppColors.primary,
                     backgroundColor: Colors.grey[200],
                     labelStyle: TextStyle(
                       color: isSelected ? Colors.white : Colors.grey[700],
@@ -285,7 +286,7 @@ class CommunityHomeScreenState extends State<CommunityHomeScreen> {
             _loadPosts(forceRefresh: true);
           }
         },
-        backgroundColor: const Color(0xFF66BB6A),
+        backgroundColor: AppColors.primary,
         child: const Icon(Icons.edit, color: Colors.white),
       ),
     );
@@ -586,7 +587,9 @@ class CommunityHomeScreenState extends State<CommunityHomeScreen> {
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(context, true),
-                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.red,
+                          ),
                           child: const Text('삭제'),
                         ),
                       ],
@@ -597,7 +600,7 @@ class CommunityHomeScreenState extends State<CommunityHomeScreen> {
                     try {
                       // 게시글 삭제 API 호출
                       await _postService.deletePost(post.postId);
-                      
+
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(

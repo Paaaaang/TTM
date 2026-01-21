@@ -1,5 +1,6 @@
 /// 친구 추가 화면
 import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 
 /// 사용자 검색 결과 모델
 class SearchUser {
@@ -74,9 +75,15 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
       if (mounted) {
         setState(() {
           _searchResults = _dummyUsers
-              .where((user) =>
-                  user.username.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-                  user.name.toLowerCase().contains(_searchController.text.toLowerCase()))
+              .where(
+                (user) =>
+                    user.username.toLowerCase().contains(
+                      _searchController.text.toLowerCase(),
+                    ) ||
+                    user.name.toLowerCase().contains(
+                      _searchController.text.toLowerCase(),
+                    ),
+              )
               .toList();
           _isSearching = false;
         });
@@ -125,7 +132,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                     ElevatedButton(
                       onPressed: _handleSearch,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF66BB6A),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -146,9 +153,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
           const SizedBox(height: 8),
 
           // 검색 결과
-          Expanded(
-            child: _buildContent(),
-          ),
+          Expanded(child: _buildContent()),
         ],
       ),
     );
@@ -158,7 +163,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
     if (_isSearching) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF66BB6A)),
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),
       );
     }
@@ -168,18 +173,11 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.person_search,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.person_search, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               '검색 결과가 없습니다',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -191,18 +189,11 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.people_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               '사용자 이름 또는 아이디로\n친구를 검색해보세요',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ],
@@ -233,7 +224,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
           // 프로필 이미지
           CircleAvatar(
             radius: 28,
-            backgroundColor: const Color(0xFF66BB6A),
+            backgroundColor: AppColors.primary,
             child: Text(
               user.name[0],
               style: const TextStyle(
@@ -267,14 +258,14 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF66BB6A).withOpacity(0.15),
+                        color: AppColors.primary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         'Lv.${user.level}',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF66BB6A),
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -284,10 +275,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                 const SizedBox(height: 4),
                 Text(
                   '@${user.username}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -316,7 +304,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
               : ElevatedButton(
                   onPressed: () => _handleAddFriend(user),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF66BB6A),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,

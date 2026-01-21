@@ -37,17 +37,15 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
     if (_searchQuery.isEmpty) {
       return _friends;
     }
-    return _friends
-        .where((friend) {
-          final nickname = friend.nickname.toLowerCase();
-          final memberName = (friend.memberName ?? '').toLowerCase();
-          final email = friend.email.toLowerCase();
-          final query = _searchQuery.toLowerCase();
-          return nickname.contains(query) ||
-              memberName.contains(query) ||
-              email.contains(query);
-        })
-        .toList();
+    return _friends.where((friend) {
+      final nickname = friend.nickname.toLowerCase();
+      final memberName = (friend.memberName ?? '').toLowerCase();
+      final email = friend.email.toLowerCase();
+      final query = _searchQuery.toLowerCase();
+      return nickname.contains(query) ||
+          memberName.contains(query) ||
+          email.contains(query);
+    }).toList();
   }
 
   Future<void> _loadFriends() async {
@@ -67,7 +65,9 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
       }
 
       final friends = await _authService.getFriends(user.memberId);
-      final filtered = friends.where((f) => f.memberId != user.memberId).toList();
+      final filtered = friends
+          .where((f) => f.memberId != user.memberId)
+          .toList();
 
       if (mounted) {
         setState(() {
@@ -165,59 +165,143 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : (_errorMessage != null)
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
-                            const SizedBox(height: 12),
-                            Text(
-                              _errorMessage!,
-                              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                            ),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.grey[400],
                         ),
-                      )
-                    : _filteredFriends.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                        const SizedBox(height: 12),
+                        Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : _filteredFriends.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.people_outline,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _searchQuery.isEmpty ? '친구가 없습니다' : '검색 결과가 없습니다',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/friends/add');
+                          },
+                          icon: const Icon(Icons.person_add),
+                          label: const Text('친구 추가하기'),
+                        ),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _loadFriends,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: _filteredFriends.length,
+                      itemBuilder: (context, index) {
+                        final friend = _filteredFriends[index];
+                        // Dismissible로 감싸서 스와이프 삭제 기능 추가
+                        return Dismissible(
+                          key: Key('friend_${friend.memberId}'),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            alignment: Alignment.centerRight,
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Icon(
-                                  Icons.people_outline,
-                                  size: 64,
-                                  color: Colors.grey[400],
-                                ),
-                                const SizedBox(height: 16),
+                                Icon(Icons.delete, color: Colors.white),
+                                SizedBox(width: 8),
                                 Text(
-                                  _searchQuery.isEmpty ? '친구가 없습니다' : '검색 결과가 없습니다',
+                                  '삭제',
                                   style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey[600],
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                TextButton.icon(
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/friends/add');
-                                  },
-                                  icon: const Icon(Icons.person_add),
-                                  label: const Text('친구 추가하기'),
                                 ),
                               ],
                             ),
-                          )
-                        : RefreshIndicator(
-                            onRefresh: _loadFriends,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              itemCount: _filteredFriends.length,
-                              itemBuilder: (context, index) {
-                                final friend = _filteredFriends[index];
-                                return _buildFriendCard(friend);
-                              },
-                            ),
                           ),
+                          confirmDismiss: (direction) async {
+                            return await showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('친구 삭제'),
+                                content: Text(
+                                  '${friend.nickname}님을 친구 목록에서 삭제하시겠습니까?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
+                                    child: const Text('취소'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.red,
+                                    ),
+                                    child: const Text('삭제'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          onDismissed: (direction) {
+                            setState(() {
+                              _friends.removeWhere(
+                                (f) => f.memberId == friend.memberId,
+                              );
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '${friend.nickname}님이 친구 목록에서 삭제되었습니다',
+                                ),
+                                action: SnackBarAction(
+                                  label: '취소',
+                                  onPressed: () {
+                                    // 실제로는 서버 API 호출 취소가 필요
+                                    setState(() {
+                                      _friends.insert(index, friend);
+                                    });
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                          child: _buildFriendCard(friend),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
@@ -235,10 +319,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
       child: Row(
         children: [
           // 프로필 이미지
-          ProfileAvatar(
-            size: 56,
-            profileImageUrl: friend.profileImage,
-          ),
+          ProfileAvatar(size: 56, profileImageUrl: friend.profileImage),
 
           const SizedBox(width: 12),
 
@@ -261,10 +342,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
                 const SizedBox(height: 4),
                 Text(
                   friend.memberName ?? friend.email,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -298,7 +376,11 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.person_remove_outlined, size: 20, color: Colors.red),
+                    Icon(
+                      Icons.person_remove_outlined,
+                      size: 20,
+                      color: Colors.red,
+                    ),
                     SizedBox(width: 12),
                     Text('친구 삭제', style: TextStyle(color: Colors.red)),
                   ],
@@ -330,10 +412,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
                 SnackBar(content: Text('${friend.nickname}님이 친구 목록에서 삭제되었습니다')),
               );
             },
-            child: const Text(
-              '삭제',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('삭제', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

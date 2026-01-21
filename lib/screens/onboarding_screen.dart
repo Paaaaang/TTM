@@ -1,6 +1,7 @@
 /// 온보딩 화면
 /// 스크린샷 디자인을 Flutter로 구현
-import 'package:flutter/material.dart';                                                                             
+import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 
 /// 온보딩(환영) 화면 위젯
 /// 사용자 닉네임과 함께 앱 시작 안내 표시
@@ -29,7 +30,7 @@ class OnboardingScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 120),
-                
+
                 // 로고
                 Image.asset(
                   'assets/icons/logoIcon.png',
@@ -41,7 +42,7 @@ class OnboardingScreen extends StatelessWidget {
                       width: 200,
                       height: 200,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF66BB6A),
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: const Icon(
@@ -52,7 +53,7 @@ class OnboardingScreen extends StatelessWidget {
                     );
                   },
                 ),
-                
+
                 const SizedBox(height: 40),
 
                 // 부제목
@@ -65,21 +66,18 @@ class OnboardingScreen extends StatelessWidget {
                     color: Color(0xFF424242),
                   ),
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // 설명 텍스트
                 const Text(
                   '사진 하나로 영양정보를 빠르게 확인하세요!',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF757575),
-                  ),
+                  style: TextStyle(fontSize: 14, color: Color(0xFF757575)),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const Spacer(),
-                
+
                 // 로그인 버튼
                 SizedBox(
                   width: double.infinity,
@@ -90,7 +88,7 @@ class OnboardingScreen extends StatelessWidget {
                       Navigator.pushNamed(context, '/login');
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF66BB6A),
+                      backgroundColor: AppColors.primary,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -107,9 +105,9 @@ class OnboardingScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // 회원가입 버튼
                 SizedBox(
                   width: double.infinity,
@@ -120,25 +118,25 @@ class OnboardingScreen extends StatelessWidget {
                     },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(
-                        color: Color(0xFF66BB6A),
+                        color: AppColors.primary,
                         width: 2,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      overlayColor: const Color(0xFF66BB6A).withOpacity(0.1),
+                      overlayColor: AppColors.primary.withOpacity(0.1),
                     ),
                     child: const Text(
                       '회원가입',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF66BB6A),
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 120),
               ],
             ),

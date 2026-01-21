@@ -3,15 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
+import 'package:ttm/constants/app_colors.dart';
 import 'package:ttm/services/ai_service.dart';
 import 'package:ttm/services/auth_service.dart';
 import 'package:ttm/providers/language_provider.dart';
 
 /// 메시지 타입
-enum MessageType {
-  user,
-  ai,
-}
+enum MessageType { user, ai }
 
 /// 메시지 모델
 class Message {
@@ -50,26 +48,30 @@ class _AICoachScreenState extends State<AICoachScreen> {
   // 시간대별 추천 질문
   List<Map<String, dynamic>> get _recommendedQuestions {
     final hour = DateTime.now().hour;
-    
-    if (hour >= 6 && hour < 11) { // 아침
+
+    if (hour >= 6 && hour < 11) {
+      // 아침
       return [
         {'icon': Icons.wb_sunny, 'text': '오늘 아침 식단 추천해줘'},
         {'icon': Icons.directions_run, 'text': '가벼운 아침 스트레칭 알려줘'},
         {'icon': Icons.water_drop, 'text': '공복에 물 마시는 게 좋을까?'},
       ];
-    } else if (hour >= 11 && hour < 14) { // 점심
+    } else if (hour >= 11 && hour < 14) {
+      // 점심
       return [
         {'icon': Icons.restaurant, 'text': '다이어트 점심 메뉴 추천해줘'},
         {'icon': Icons.coffee, 'text': '식후 커피 괜찮을까?'},
         {'icon': Icons.timer, 'text': '점심 먹고 가벼운 산책 효과'},
       ];
-    } else if (hour >= 17 && hour < 21) { // 저녁
+    } else if (hour >= 17 && hour < 21) {
+      // 저녁
       return [
         {'icon': Icons.fitness_center, 'text': '퇴근 후 하기 좋은 운동'},
         {'icon': Icons.dinner_dining, 'text': '저탄수화물 저녁 식단'},
         {'icon': Icons.bed, 'text': '야식 참는 방법 알려줘'},
       ];
-    } else { // 밤/새벽/그 외
+    } else {
+      // 밤/새벽/그 외
       return [
         {'icon': Icons.bedtime, 'text': '숙면에 좋은 습관'},
         {'icon': Icons.spa, 'text': '피로 회복에 좋은 음식'},
@@ -87,19 +89,22 @@ class _AICoachScreenState extends State<AICoachScreen> {
   Future<void> _loadUserName() async {
     final user = await AuthService().getCurrentUser();
     final nickname = user?.nickname;
-    
+
     if (mounted) {
       setState(() {
         // AI 환영 메시지 추가 (닉네임 포함)
         String welcomeText = LanguageProvider().getText('ai_welcome');
         if (nickname != null) {
-          welcomeText = '$nickname님 안녕하세요! ${welcomeText.replaceAll('안녕하세요! ', '')}';
+          welcomeText =
+              '$nickname님 안녕하세요! ${welcomeText.replaceAll('안녕하세요! ', '')}';
         }
-        
+
         _addMessage(MessageType.ai, welcomeText);
       });
 
-      if (!_didSendInitial && widget.initialPrompt != null && widget.initialPrompt!.trim().isNotEmpty) {
+      if (!_didSendInitial &&
+          widget.initialPrompt != null &&
+          widget.initialPrompt!.trim().isNotEmpty) {
         _didSendInitial = true;
         _sendMessage(widget.initialPrompt!.trim());
       }
@@ -121,10 +126,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.purple[400]!,
-              Colors.blue[400]!,
-            ],
+            colors: [Colors.purple[400]!, Colors.blue[400]!],
           ),
         ),
         child: SafeArea(
@@ -189,7 +191,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
               if (!popped) {
                 // 더 이상 뒤로 갈 곳이 없으면 메인으로 이동
                 if (mounted) {
-                   Navigator.pushReplacementNamed(context, '/main');
+                  Navigator.pushReplacementNamed(context, '/main');
                 }
               }
             },
@@ -209,10 +211,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
                 ),
                 Text(
                   '24시간 건강 상담',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.white70),
                 ),
               ],
             ),
@@ -246,7 +245,9 @@ class _AICoachScreenState extends State<AICoachScreen> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: Row(
-          mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment: isUser
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!isUser) ...[
@@ -271,19 +272,29 @@ class _AICoachScreenState extends State<AICoachScreen> {
             // 메시지 버블
             Flexible(
               child: Column(
-                crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: isUser
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       gradient: isUser
                           ? const LinearGradient(
-                              colors: [Color(0xFF66BB6A), Color(0xFF43A047)],
+                              colors: [
+                                AppColors.primary,
+                                AppColors.primaryDark,
+                              ],
                             )
                           : null,
                       color: isUser ? null : Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      border: isUser ? null : Border.all(color: Colors.grey[300]!),
+                      border: isUser
+                          ? null
+                          : Border.all(color: Colors.grey[300]!),
                     ),
                     child: isUser
                         ? Text(
@@ -326,10 +337,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
                   const SizedBox(height: 4),
                   Text(
                     DateFormat('HH:mm').format(message.time),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey[500],
-                    ),
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                   ),
                 ],
               ),
@@ -427,11 +435,16 @@ class _AICoachScreenState extends State<AICoachScreen> {
                     onTap: () => _sendMessage(q['text'] as String),
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.purple.withOpacity(0.1)),
+                        border: Border.all(
+                          color: Colors.purple.withOpacity(0.1),
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.purple.withOpacity(0.05),
@@ -536,17 +549,20 @@ class _AICoachScreenState extends State<AICoachScreen> {
   /// 메시지 추가
   void _addMessage(MessageType type, String content) {
     setState(() {
-      _messages.add(Message(
-        id: _messageIdCounter++,
-        type: type,
-        content: content,
-        time: DateTime.now(),
-      ));
+      _messages.add(
+        Message(
+          id: _messageIdCounter++,
+          type: type,
+          content: content,
+          time: DateTime.now(),
+        ),
+      );
     });
 
     // 스크롤을 맨 아래로
     Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollController.hasClients && _scrollController.position.hasContentDimensions) {
+      if (_scrollController.hasClients &&
+          _scrollController.position.hasContentDimensions) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
@@ -574,7 +590,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
 
       // AI 응답 요청 (Gemini)
       final reply = await _aiService.chat(text, memberId: memberId);
-      
+
       if (mounted) {
         setState(() {
           _isTyping = false;

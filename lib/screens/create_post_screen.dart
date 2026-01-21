@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:ttm/constants/app_colors.dart';
 import '../models/user.dart';
 import '../services/post_service.dart';
 import '../services/auth_service.dart';
@@ -26,7 +27,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final PostService _postService = PostService();
   final AuthService _authService = AuthService();
   final ImagePicker _imagePicker = ImagePicker();
-  
+
   List<XFile> _selectedImages = []; // 선택된 이미지 파일들
   String _selectedCategory = 'FREE'; // 기본값: 자유
   String _selectedVisibility = 'PUBLIC'; // 기본값: 전체 공개
@@ -61,6 +62,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Widget _buildScaffold(User? currentUser) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true, // 키보드가 올라올 때 자동으로 화면 조정
       appBar: AppBar(
         title: const Text('게시글 작성'),
         backgroundColor: Colors.white,
@@ -77,7 +79,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 fontWeight: FontWeight.w600,
                 color: _contentController.text.trim().isEmpty
                     ? Colors.grey[400]
-                    : const Color(0xFF66BB6A),
+                    : AppColors.primary,
               ),
             ),
           ),
@@ -148,7 +150,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
                   // 카테고리 선택
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(8),
@@ -213,10 +218,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       ),
                       border: InputBorder.none,
                     ),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
-                    ),
+                    style: const TextStyle(fontSize: 16, height: 1.5),
                     onChanged: (value) {
                       setState(() {}); // 게시 버튼 활성화/비활성화를 위한 리빌드
                     },
@@ -266,7 +268,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                   top: 4,
                                   left: 4,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.black54,
                                       borderRadius: BorderRadius.circular(4),
@@ -314,7 +319,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                       onTap: () {
                                         setState(() {
                                           final temp = _selectedImages[index];
-                                          _selectedImages[index] = _selectedImages[index - 1];
+                                          _selectedImages[index] =
+                                              _selectedImages[index - 1];
                                           _selectedImages[index - 1] = temp;
                                         });
                                       },
@@ -341,7 +347,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                       onTap: () {
                                         setState(() {
                                           final temp = _selectedImages[index];
-                                          _selectedImages[index] = _selectedImages[index + 1];
+                                          _selectedImages[index] =
+                                              _selectedImages[index + 1];
                                           _selectedImages[index + 1] = temp;
                                         });
                                       },
@@ -372,9 +379,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: Colors.grey[200]!),
-                      ),
+                      border: Border(top: BorderSide(color: Colors.grey[200]!)),
                     ),
                     child: Row(
                       children: [
@@ -382,7 +387,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         _buildActionButton(
                           icon: Icons.add_photo_alternate,
                           label: '사진 추가',
-                          color: const Color(0xFF66BB6A),
+                          color: AppColors.primary,
                           onTap: _pickImages,
                         ),
                       ],
@@ -437,25 +442,29 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         }
         return;
       }
-      
+
       final List<XFile> images = await _imagePicker.pickMultiImage();
-      
+
       if (images.isNotEmpty) {
         // 2개 초과 방지
         final availableSlots = 2 - _selectedImages.length;
         final imagesToAdd = images.take(availableSlots).toList();
-        
+
         setState(() {
           // 명시적으로 XFile 타입으로 추가
           for (final image in imagesToAdd) {
             _selectedImages.add(image);
           }
         });
-        
+
         if (mounted) {
           if (images.length > availableSlots) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('${imagesToAdd.length}개의 이미지가 추가되었습니다 (최대 2개 제한)')),
+              SnackBar(
+                content: Text(
+                  '${imagesToAdd.length}개의 이미지가 추가되었습니다 (최대 2개 제한)',
+                ),
+              ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -467,9 +476,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     } catch (e) {
       print('이미지 선택 오류: $e'); // 디버깅용
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('이미지 선택 중 오류가 발생했습니다: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('이미지 선택 중 오류가 발생했습니다: $e')));
       }
     }
   }
@@ -490,10 +499,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               padding: EdgeInsets.all(16),
               child: Text(
                 '공개 범위 선택',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ),
             ListTile(
@@ -501,7 +507,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               title: const Text('전체 공개'),
               subtitle: const Text('모든 사용자가 볼 수 있습니다'),
               trailing: _selectedVisibility == 'PUBLIC'
-                  ? const Icon(Icons.check, color: Color(0xFF66BB6A))
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () {
                 setState(() {
@@ -515,7 +521,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               title: const Text('친구 공개'),
               subtitle: const Text('친구만 볼 수 있습니다'),
               trailing: _selectedVisibility == 'FRIENDS'
-                  ? const Icon(Icons.check, color: Color(0xFF66BB6A))
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () {
                 setState(() {
@@ -529,7 +535,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               title: const Text('비공개'),
               subtitle: const Text('나만 볼 수 있습니다'),
               trailing: _selectedVisibility == 'PRIVATE'
-                  ? const Icon(Icons.check, color: Color(0xFF66BB6A))
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () {
                 setState(() {
@@ -548,20 +554,20 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Future<void> _submitPost() async {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
-    
+
     if (content.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('내용을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('내용을 입력해주세요')));
       return;
     }
 
     final currentUser = await _authService.getCurrentUser();
     if (currentUser == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('로그인이 필요합니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('로그인이 필요합니다')));
       }
       return;
     }
@@ -587,13 +593,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               http.MultipartFile.fromBytes(
                 'file',
                 imageBytes,
-                filename: 'image_${DateTime.now().millisecondsSinceEpoch}_${i + 1}.jpg',
+                filename:
+                    'image_${DateTime.now().millisecondsSinceEpoch}_${i + 1}.jpg',
               ),
             );
-            
+
             final streamedResponse = await request.send();
             final response = await http.Response.fromStream(streamedResponse);
-            
+
             if (response.statusCode == 200) {
               final result = json.decode(response.body);
               images.add({
@@ -607,7 +614,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             print('이미지 ${i + 1} 업로드 오류: $e');
             // 이미지 업로드 실패 시 placeholder 사용
             images.add({
-              'imagePath': 'https://via.placeholder.com/400x300.png?text=Upload+Failed',
+              'imagePath':
+                  'https://via.placeholder.com/400x300.png?text=Upload+Failed',
               'displayOrder': i + 1,
             });
           }
@@ -630,9 +638,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       });
 
       // 성공 메시지 표시
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('게시글이 작성되었습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('게시글이 작성되었습니다')));
 
       // 이전 화면으로 돌아가기
       Navigator.pop(context, true); // true를 반환하여 목록 새로고침 유도
@@ -643,9 +651,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('게시글 작성에 실패했습니다: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('게시글 작성에 실패했습니다: $e')));
     }
   }
 
@@ -667,7 +675,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       const Color(0xFFE91E63),
       const Color(0xFF3F51B5),
     ];
-    
+
     final hash = nickname.hashCode.abs();
     return colors[hash % colors.length];
   }

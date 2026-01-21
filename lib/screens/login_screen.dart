@@ -32,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true, // 키보드가 올라올 때 자동으로 화면 조정
       body: Stack(
         children: [
           SafeArea(
@@ -41,355 +42,377 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                // 뒤로가기 버튼
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.arrow_back, size: 20, color: Colors.black54),
-                      const SizedBox(width: 8),
-                      Text(
-                        '뒤로',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // 로고 및 제목
-                Center(
-                  child: Column(
-                    children: [
-                      // 로고
-                      Image.asset(
-                        'assets/icons/logoIcon.png',
-                        width: 160,
-                        height: 160,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        '로그인',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 40),
-
-                // 로그인 폼
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 아이디 또는 이메일 입력
-                    const Text(
-                      '아이디',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _usernameController,
-                      decoration: InputDecoration(
-                        hintText: '아이디를 입력해주세요',
-                        filled: true,
-                        fillColor: Colors.grey[50],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFF66BB6A), width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 비밀번호 입력
-                    const Text(
-                      '비밀번호',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: !_showPassword,
-                      decoration: InputDecoration(
-                        hintText: '비밀번호',
-                        filled: true,
-                        fillColor: Colors.grey[50],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFF66BB6A), width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _showPassword ? Icons.visibility : Icons.visibility_off,
-                            color: Colors.grey[600],
+                    // 뒤로가기 버튼
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.arrow_back,
+                            size: 20,
+                            color: Colors.black54,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _showPassword = !_showPassword;
-                            });
-                          },
-                        ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '뒤로',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
 
-                    // 로그인 버튼
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: _handleLogin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF66BB6A),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                    // 로고 및 제목
+                    Center(
+                      child: Column(
+                        children: [
+                          // 로고
+                          Image.asset(
+                            'assets/icons/logoIcon.png',
+                            width: 160,
+                            height: 160,
+                            fit: BoxFit.contain,
                           ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          '로그인',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                // OR 구분선
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        '또는',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                // 소셜 로그인 버튼들
-                Column(
-                  children: [
-                    // 카카오 로그인
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: OutlinedButton(
-                        onPressed: _handleKakaoLogin,
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFEE500),
-                          foregroundColor: Colors.black87,
-                          side: BorderSide.none,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const FaIcon(
-                              FontAwesomeIcons.commentDots,
-                              size: 20,
+                          const SizedBox(height: 16),
+                          const Text(
+                            '로그인',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
                               color: Colors.black87,
                             ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              '카카오로 시작하기',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // 네이버 로그인
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: OutlinedButton(
-                        onPressed: _handleNaverLogin,
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: const Color(0xFF03C75A),
-                          foregroundColor: Colors.white,
-                          side: BorderSide.none,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  'N',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFF03C75A),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              '네이버로 시작하기',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 40),
 
-                    // 구글 로그인
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: OutlinedButton(
-                        onPressed: _handleGoogleLogin,
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black87,
-                          side: BorderSide(color: Colors.grey[300]!),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const FaIcon(
-                              FontAwesomeIcons.google,
-                              size: 20,
-                              color: Color(0xFF4285F4),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              '구글로 시작하기',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // 회원가입 링크
-                Center(
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/signup');
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    // 로그인 폼
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '계정이 없으신가요? ',
+                        // 아이디 또는 이메일 입력
+                        const Text(
+                          '아이디',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _usernameController,
+                          decoration: InputDecoration(
+                            hintText: '아이디를 입력해주세요',
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: AppColors.primary,
+                                width: 2,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 16,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // 비밀번호 입력
                         const Text(
-                          '회원가입',
+                          '비밀번호',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Color(0xFF66BB6A),
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _passwordController,
+                          obscureText: !_showPassword,
+                          decoration: InputDecoration(
+                            hintText: '비밀번호',
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: AppColors.primary,
+                                width: 2,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 16,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _showPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.grey[600],
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _showPassword = !_showPassword;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // 로그인 버튼
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: _handleLogin,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              '로그인',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
+
+                    const SizedBox(height: 24),
+
+                    // OR 구분선
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(color: Colors.grey[300], thickness: 1),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            '또는',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(color: Colors.grey[300], thickness: 1),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // 소셜 로그인 버튼들
+                    Column(
+                      children: [
+                        // 카카오 로그인
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton(
+                            onPressed: _handleKakaoLogin,
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFEE500),
+                              foregroundColor: Colors.black87,
+                              side: BorderSide.none,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.commentDots,
+                                  size: 20,
+                                  color: Colors.black87,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  '카카오로 시작하기',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // 네이버 로그인
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton(
+                            onPressed: _handleNaverLogin,
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: const Color(0xFF03C75A),
+                              foregroundColor: Colors.white,
+                              side: BorderSide.none,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      'N',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFF03C75A),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  '네이버로 시작하기',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // 구글 로그인
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton(
+                            onPressed: _handleGoogleLogin,
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black87,
+                              side: BorderSide(color: Colors.grey[300]!),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.google,
+                                  size: 20,
+                                  color: Color(0xFF4285F4),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  '구글로 시작하기',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 회원가입 링크
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/signup');
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '계정이 없으신가요? ',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const Text(
+                              '회원가입',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-          
+
           // 로딩 인디케이터
           if (_isLoading)
             Container(
               color: Colors.black26,
               child: const Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF66BB6A)),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                 ),
               ),
             ),
@@ -404,9 +427,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('이메일과 비밀번호를 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('이메일과 비밀번호를 입력해주세요')));
       return;
     }
 
@@ -418,20 +441,20 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (user != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user.nickname}님 환영합니다!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${user.nickname}님 환영합니다!')));
         Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('아이디 또는 비밀번호가 일치하지 않습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('아이디 또는 비밀번호가 일치하지 않습니다')));
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('로그인 중 오류가 발생했습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('로그인 중 오류가 발생했습니다')));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -442,23 +465,23 @@ class _LoginScreenState extends State<LoginScreen> {
   /// 카카오 로그인
   Future<void> _handleKakaoLogin() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final user = await _authService.loginWithKakao();
-      
+
       if (!mounted) return;
-      
+
       if (user != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user.nickname}님 환영합니다!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${user.nickname}님 환영합니다!')));
         Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('카카오 로그인 중 오류가 발생했습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('카카오 로그인 중 오류가 발생했습니다')));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -469,23 +492,23 @@ class _LoginScreenState extends State<LoginScreen> {
   /// 네이버 로그인
   Future<void> _handleNaverLogin() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final user = await _authService.loginWithNaver();
-      
+
       if (!mounted) return;
-      
+
       if (user != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user.nickname}님 환영합니다!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${user.nickname}님 환영합니다!')));
         Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('네이버 로그인 중 오류가 발생했습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('네이버 로그인 중 오류가 발생했습니다')));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -496,23 +519,23 @@ class _LoginScreenState extends State<LoginScreen> {
   /// 구글 로그인
   Future<void> _handleGoogleLogin() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final user = await _authService.loginWithGoogle();
-      
+
       if (!mounted) return;
-      
+
       if (user != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user.nickname}님 환영합니다!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${user.nickname}님 환영합니다!')));
         Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('구글 로그인 중 오류가 발생했습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('구글 로그인 중 오류가 발생했습니다')));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -520,4 +543,3 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 }
-

@@ -2,6 +2,7 @@
 /// MealRecordDetailScreen.tsx를 Flutter로 변환
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ttm/constants/app_colors.dart';
 
 /// 식단 기록 모델
 class MealRecord {
@@ -24,10 +25,7 @@ class MealRecord {
 class MealDetailScreen extends StatelessWidget {
   final MealRecord meal;
 
-  const MealDetailScreen({
-    Key? key,
-    required this.meal,
-  }) : super(key: key);
+  const MealDetailScreen({Key? key, required this.meal}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +43,7 @@ class MealDetailScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF66BB6A),
-              Color(0xFF43A047),
-            ],
+            colors: [AppColors.primary, AppColors.primaryDark],
           ),
         ),
         child: SafeArea(
@@ -145,11 +140,7 @@ class MealDetailScreen extends StatelessWidget {
               color: Colors.green[50],
               borderRadius: BorderRadius.circular(15),
             ),
-            child: Icon(
-              _getMealIcon(meal.meal),
-              size: 32,
-              color: Colors.green,
-            ),
+            child: Icon(_getMealIcon(meal.meal), size: 32, color: Colors.green),
           ),
           const SizedBox(width: 16),
           // 식단 정보
@@ -167,24 +158,22 @@ class MealDetailScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
+                    Icon(
+                      Icons.calendar_today,
+                      size: 14,
+                      color: Colors.grey[600],
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       DateFormat('yyyy.MM.dd').format(meal.date),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                     const SizedBox(width: 12),
                     Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
                       DateFormat('HH:mm').format(meal.date),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -223,10 +212,7 @@ class MealDetailScreen extends StatelessWidget {
           const SizedBox(height: 8),
           const Text(
             '총 칼로리',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.white70),
           ),
           const SizedBox(height: 4),
           Row(
@@ -245,10 +231,7 @@ class MealDetailScreen extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 8, left: 4),
                 child: Text(
                   'kcal',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 20, color: Colors.white70),
                 ),
               ),
             ],
@@ -278,15 +261,14 @@ class MealDetailScreen extends StatelessWidget {
         children: [
           const Text(
             '음식 항목',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           ...items.asMap().entries.map((entry) {
             return Padding(
-              padding: EdgeInsets.only(bottom: entry.key < items.length - 1 ? 12 : 0),
+              padding: EdgeInsets.only(
+                bottom: entry.key < items.length - 1 ? 12 : 0,
+              ),
               child: Row(
                 children: [
                   Container(
@@ -297,10 +279,7 @@ class MealDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Center(
-                      child: Text(
-                        '🍽️',
-                        style: TextStyle(fontSize: 20),
-                      ),
+                      child: Text('🍽️', style: TextStyle(fontSize: 20)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -342,10 +321,7 @@ class MealDetailScreen extends StatelessWidget {
         children: [
           const Text(
             '영양소 정보',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           _buildNutrientRow('탄수화물', carbs, Colors.blue),
@@ -369,28 +345,18 @@ class MealDetailScreen extends StatelessWidget {
             color: color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(
-            Icons.water_drop,
-            color: color,
-            size: 20,
-          ),
+          child: Icon(Icons.water_drop, color: color, size: 20),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 15,
-              color: Colors.grey[700],
-            ),
+            style: TextStyle(fontSize: 15, color: Colors.grey[700]),
           ),
         ),
         Text(
           '$value g',
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ],
     );

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:ttm/screens/survey/survey_screen.dart';
+import 'package:ttm/constants/app_colors.dart';
 
 class WelcomeScreen extends StatelessWidget {
   final String nickname;
   final int memberId;
 
   const WelcomeScreen({
-    super.key, 
+    super.key,
     required this.nickname,
     required this.memberId,
   });
@@ -26,12 +27,14 @@ class WelcomeScreen extends StatelessWidget {
                 child: TextButton(
                   onPressed: () {
                     // Skip logic: maybe go to home directly?
-                     Navigator.of(context).pushNamedAndRemoveUntil('/main', (route) => false);
+                    Navigator.of(
+                      context,
+                    ).pushNamedAndRemoveUntil('/main', (route) => false);
                   },
                   child: Text(
                     '건너뛰기',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: AppColors.textSecondary,
                       decoration: TextDecoration.underline,
                     ),
                   ),
@@ -41,12 +44,12 @@ class WelcomeScreen extends StatelessWidget {
               // Content
               Column(
                 children: [
-                   RichText(
+                  RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
                       style: const TextStyle(
                         fontSize: 28,
-                        color: Colors.black87,
+                        color: AppColors.textPrimary,
                       ),
                       children: [
                         TextSpan(
@@ -63,7 +66,7 @@ class WelcomeScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF66BB6A),
+                      color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -72,7 +75,7 @@ class WelcomeScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey[700],
+                      color: AppColors.textSecondary,
                       height: 1.5,
                     ),
                   ),
@@ -93,7 +96,7 @@ class WelcomeScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF66BB6A),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -102,10 +105,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   child: const Text(
                     '다음',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
