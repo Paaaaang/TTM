@@ -20,23 +20,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final AuthService _authService = AuthService();
   final BadgeService _badgeService = BadgeService();
   final ProfileService _profileService = ProfileService();
-  
+
   /// 현재 사용자 정보
   User? _currentUser;
-  
+
   /// 배지 관련 데이터
   List<model.Badge> _allBadges = [];
   List<model.MemberBadge> _memberBadges = [];
   model.BadgeStats? _badgeStats;
   bool _isLoadingBadges = false;
-  
+
   /// 활동 통계 (DB 연동)
   int _mealCount = 0;
   int _workoutCount = 0;
   int _postCount = 0;
   int _likeCount = 0;
   bool _isLoadingStats = false;
-  
+
   // 사용자 정보
   String get userName => _currentUser?.nickname ?? '사용자';
   String get userEmail => _currentUser?.email ?? '';
@@ -45,23 +45,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final created = _currentUser!.createdAt!;
     return '${created.year}.${created.month.toString().padLeft(2, '0')}.${created.day.toString().padLeft(2, '0')}';
   }
-  
+
   // 출석(접속) 일차 - 가입일로부터 경과일 (날짜 기준 계산)
   int get attendanceDays {
     if (_currentUser?.createdAt == null) return 0;
-    
+
     final now = DateTime.now();
     // 현재 날짜의 자정 (시간 제거)
     final today = DateTime(now.year, now.month, now.day);
-    
+
     final created = _currentUser!.createdAt!;
     // 가입 날짜의 자정 (시간 제거)
     final joinDate = DateTime(created.year, created.month, created.day);
-    
+
     final diff = today.difference(joinDate);
     return diff.inDays + 1; // +1은 가입일도 포함
   }
-  
+
   @override
   void initState() {
     super.initState();
@@ -78,14 +78,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
       if (_currentUser != null) {
         // 모든 데이터 로드가 완료될 때까지 대기
-        await Future.wait([
-          _loadBadges(),
-          _loadActivityStats(),
-        ]);
+        await Future.wait([_loadBadges(), _loadActivityStats()]);
       }
     }
   }
-  
+
   /// 사용자 정보 로드
   Future<void> _loadUserInfo() async {
     // 1. 먼저 로컬 캐시된 정보로 빠르게 화면 표시
@@ -110,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // 만약 닉네임 변경 등이 배지에 영향을 준다면 여기서 다시 로드해야 함
     }
   }
-  
+
   /// 활동 통계 로드 (DB 연동)
   Future<void> _loadActivityStats() async {
     final user = _currentUser;
@@ -138,21 +135,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
-  
+
   /// 배지 정보 로드
   Future<void> _loadBadges() async {
     if (_currentUser == null) return;
-    
+
     setState(() {
       _isLoadingBadges = true;
     });
-    
+
     try {
       // forceRefresh: true로 강제 새로고침
       final allBadges = await _badgeService.getAllBadges(forceRefresh: true);
-      final memberBadges = await _badgeService.getMemberBadges(_currentUser!.memberId, forceRefresh: true);
-      final stats = await _badgeService.getBadgeStats(_currentUser!.memberId, forceRefresh: true);
-      
+      final memberBadges = await _badgeService.getMemberBadges(
+        _currentUser!.memberId,
+        forceRefresh: true,
+      );
+      final stats = await _badgeService.getBadgeStats(
+        _currentUser!.memberId,
+        forceRefresh: true,
+      );
+
       if (mounted) {
         setState(() {
           _allBadges = allBadges;
@@ -199,22 +202,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               // 프로필 카드
               _buildProfileCard(),
-              
+
               const SizedBox(height: 8),
-              
+
               // 내 활동 섹션
               _buildActivitySection(),
-              
+
               const SizedBox(height: 8),
-              
+
               // 내 배지 섹션
               _buildBadgesSection(),
-              
+
               const SizedBox(height: 8),
-              
+
               // 하단 메뉴
               _buildBottomMenu(),
-              
+
               const SizedBox(height: 20),
             ],
           ),
@@ -243,9 +246,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 profileImageUrl: _currentUser?.profileImage,
                 borderColor: const Color(0xFF1DB954),
               ),
-              
+
               const SizedBox(width: 16),
-              
+
               // 사용자 정보
               Expanded(
                 child: Column(
@@ -262,23 +265,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 4),
                     Text(
                       userEmail,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '가입일: $joinDate',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                   ],
                 ),
               ),
-              
+
               // 출석 일차
               Container(
                 padding: const EdgeInsets.all(16),
@@ -291,10 +288,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     const Text(
                       '출석 일차',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 11, color: Colors.grey),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -335,36 +329,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.local_activity, color: Color(0xFF1DB954), size: 20),
+                const Icon(
+                  Icons.local_activity,
+                  color: Color(0xFF1DB954),
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 const Text(
                   '내 활동',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 Icon(Icons.chevron_right, color: Colors.grey[400]),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // 활동 통계 그리드
-            _isLoadingStats 
-              ? const Center(child: CircularProgressIndicator())
-              : Row(
-                  children: [
-                    Expanded(child: _buildActivityCard('🍽️', _mealCount.toString(), '식단')),
-                    const SizedBox(width: 12),
-                    Expanded(child: _buildActivityCard('💪', _workoutCount.toString(), '운동')),
-                    const SizedBox(width: 12),
-                    Expanded(child: _buildActivityCard('📝', _postCount.toString(), '작성한 글')),
-                    const SizedBox(width: 12),
-                    Expanded(child: _buildActivityCard('❤️', _likeCount.toString(), '좋아요')),
-                  ],
-              ),
+            _isLoadingStats
+                ? const Center(child: CircularProgressIndicator())
+                : Row(
+                    children: [
+                      Expanded(
+                        child: _buildActivityCard(
+                          '🍽️',
+                          _mealCount.toString(),
+                          '식단',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildActivityCard(
+                          '💪',
+                          _workoutCount.toString(),
+                          '운동',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildActivityCard(
+                          '📝',
+                          _postCount.toString(),
+                          '작성한 글',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildActivityCard(
+                          '❤️',
+                          _likeCount.toString(),
+                          '좋아요',
+                        ),
+                      ),
+                    ],
+                  ),
           ],
         ),
       ),
@@ -381,26 +400,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         children: [
           Text(
-            emoji,
-            style: const TextStyle(fontSize: 24),
-          ),
-          const SizedBox(height: 8),
-          Text(
             count,
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
         ],
       ),
     );
@@ -419,10 +427,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: const Center(child: CircularProgressIndicator()),
       );
     }
-    
+
     final earnedCount = _badgeStats?.acquiredBadges ?? 0;
     final totalCount = _badgeStats?.totalBadges ?? 0;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
@@ -435,7 +443,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.emoji_events, color: Color(0xFF1DB954), size: 20),
+              const Icon(
+                Icons.emoji_events,
+                color: Color(0xFF1DB954),
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 '내 배지 ($earnedCount/$totalCount)',
@@ -456,9 +468,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // 배지 그리드
           if (_allBadges.isEmpty)
             const Center(
@@ -480,7 +492,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               itemCount: _allBadges.length,
               itemBuilder: (context, index) {
                 final badge = _allBadges[index];
-                final isEarned = _memberBadges.any((mb) => mb.badgeId == badge.badgeId);
+                final isEarned = _memberBadges.any(
+                  (mb) => mb.badgeId == badge.badgeId,
+                );
                 return _buildBadgeItem(badge, isEarned);
               },
             ),
@@ -492,7 +506,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildBadgeItem(model.Badge badge, bool isEarned) {
     // 아이콘 추출 (DB에 이모지로 저장되어 있다고 가정)
     final icon = badge.iconPath ?? '🏅';
-    
+
     return GestureDetector(
       onTap: () => _showBadgeDetail(badge, isEarned),
       child: Container(
@@ -530,7 +544,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-  
+
   /// 배지 상세 정보 표시
   void _showBadgeDetail(model.Badge badge, bool isEarned) {
     final earnedBadge = _memberBadges.firstWhere(
@@ -544,16 +558,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         acquiredAt: DateTime.now(),
       ),
     );
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Text(
-              badge.iconPath ?? '🏅',
-              style: const TextStyle(fontSize: 32),
-            ),
+            Text(badge.iconPath ?? '🏅', style: const TextStyle(fontSize: 32)),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -567,13 +578,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              badge.description,
-              style: const TextStyle(fontSize: 14),
-            ),
+            Text(badge.description, style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 12),
             // 획득 조건 표시
-            if (badge.badgeCondition != null && badge.badgeCondition!.isNotEmpty)
+            if (badge.badgeCondition != null &&
+                badge.badgeCondition!.isNotEmpty)
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -584,16 +593,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.info_outline, 
-                      color: Colors.blue, size: 18),
+                    const Icon(
+                      Icons.info_outline,
+                      color: Colors.blue,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         badge.badgeCondition!,
-                        style: TextStyle(
-                          color: Colors.blue[900],
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: Colors.blue[900], fontSize: 13),
                       ),
                     ),
                   ],
@@ -609,8 +618,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle, 
-                      color: Color(0xFF1DB954), size: 20),
+                    const Icon(
+                      Icons.check_circle,
+                      color: Color(0xFF1DB954),
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       '획득: ${earnedBadge.acquiredTimeAgo}',
@@ -686,4 +698,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-

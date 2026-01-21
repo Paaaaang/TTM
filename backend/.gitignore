@@ -46,6 +46,22 @@ uploads/
 # AI Models (용량이 큰 모델 파일 제외, 폴더 구조는 유지)
 ai_models/**/*.pt
 ai_models/**/*.pth
+ai_models/**/*.docx
+ai_models/**/*.pptx
+ai_models/**/*.zip
+ai_models/**/*.yaml
+ai_models/**/server/
+ai_models/**/utils/
+ai_models/**/*.py
+ai_models/**/*.ipynb
+ai_models/**/*.txt
+ai_models/**/*.sh
+ai_models/**/*.md
+ai_models/**/*.xml
+ai_models/**/.dockerignore
+ai_models/**/.gitattributes
+ai_models/**/.gitignore
+ai_models/**/LICENSE
 !ai_models/.gitkeep
 !ai_models/*/.gitkeep
 !ai_models/*/*/.gitkeep

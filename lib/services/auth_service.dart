@@ -1,5 +1,5 @@
 /// 인증 서비스
-/// 
+///
 /// REST API와 연동된 실제 인증 서비스
 /// - 회원가입, 로그인, 로그아웃 기능 제공
 /// - JWT 토큰 기반 인증
@@ -29,21 +29,23 @@ class AuthService {
     String region = '서울',
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse(ApiConfig.getUrl(ApiConfig.signupEndpoint)),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'login_id': loginId,
-          'nickname': nickname,
-          'email': email,
-          'password': password,
-          'member_name': name,
-          'region': region,
-          if (phone != null) 'phone_number': phone,
-          if (birthdate != null) 'birth_date': birthdate,
-          if (gender != null) 'gender': gender,
-        }),
-      ).timeout(ApiConfig.timeout);
+      final response = await http
+          .post(
+            Uri.parse(ApiConfig.getUrl(ApiConfig.signupEndpoint)),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'login_id': loginId,
+              'nickname': nickname,
+              'email': email,
+              'password': password,
+              'member_name': name,
+              'region': region,
+              if (phone != null) 'phone_number': phone,
+              if (birthdate != null) 'birth_date': birthdate,
+              if (gender != null) 'gender': gender,
+            }),
+          )
+          .timeout(ApiConfig.timeout);
 
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -68,10 +70,12 @@ class AuthService {
   /// GET /api/auth/check-login-id/{login_id}
   Future<bool> checkLoginIdDuplicate(String loginId) async {
     try {
-      final response = await http.get(
-        Uri.parse(ApiConfig.getUrl('/api/auth/check-login-id/$loginId')),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(ApiConfig.timeout);
+      final response = await http
+          .get(
+            Uri.parse(ApiConfig.getUrl('/api/auth/check-login-id/$loginId')),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(ApiConfig.timeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -88,10 +92,12 @@ class AuthService {
   /// GET /api/auth/check-nickname/{nickname}
   Future<bool> checkNicknameDuplicate(String nickname) async {
     try {
-      final response = await http.get(
-        Uri.parse(ApiConfig.getUrl('/api/auth/check-nickname/$nickname')),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(ApiConfig.timeout);
+      final response = await http
+          .get(
+            Uri.parse(ApiConfig.getUrl('/api/auth/check-nickname/$nickname')),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(ApiConfig.timeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -108,10 +114,12 @@ class AuthService {
   /// GET /api/auth/check-email/{email}
   Future<bool> checkEmailDuplicate(String email) async {
     try {
-      final response = await http.get(
-        Uri.parse(ApiConfig.getUrl('/api/auth/check-email/$email')),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(ApiConfig.timeout);
+      final response = await http
+          .get(
+            Uri.parse(ApiConfig.getUrl('/api/auth/check-email/$email')),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(ApiConfig.timeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -128,14 +136,13 @@ class AuthService {
   /// POST /api/auth/login
   Future<User?> login(String loginId, String password) async {
     try {
-      final response = await http.post(
-        Uri.parse(ApiConfig.getUrl(ApiConfig.loginEndpoint)),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'login_id': loginId,
-          'password': password,
-        }),
-      ).timeout(ApiConfig.timeout);
+      final response = await http
+          .post(
+            Uri.parse(ApiConfig.getUrl(ApiConfig.loginEndpoint)),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'login_id': loginId, 'password': password}),
+          )
+          .timeout(ApiConfig.timeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -166,7 +173,7 @@ class AuthService {
     // TODO: 카카오 로그인 SDK 연동
     // 임시로 더미 사용자 반환
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     final user = User(
       memberId: 100,
       loginId: 'kakao_user',
@@ -179,7 +186,7 @@ class AuthService {
 
     await _saveUser(user);
     await _saveToken('kakao_token_dummy');
-    
+
     return user;
   }
 
@@ -188,7 +195,7 @@ class AuthService {
   Future<User?> loginWithNaver() async {
     // TODO: 네이버 로그인 SDK 연동
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     final user = User(
       memberId: 200,
       loginId: 'naver_user',
@@ -201,7 +208,7 @@ class AuthService {
 
     await _saveUser(user);
     await _saveToken('naver_token_dummy');
-    
+
     return user;
   }
 
@@ -210,7 +217,7 @@ class AuthService {
   Future<User?> loginWithGoogle() async {
     // TODO: 구글 로그인 SDK 연동
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     final user = User(
       memberId: 300,
       loginId: 'google_user',
@@ -223,7 +230,7 @@ class AuthService {
 
     await _saveUser(user);
     await _saveToken('google_token_dummy');
-    
+
     return user;
   }
 
@@ -239,7 +246,7 @@ class AuthService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userJson = prefs.getString(_keyUser);
-      
+
       if (userJson == null) {
         return null;
       }
@@ -261,13 +268,15 @@ class AuthService {
 
       // 2. 서버 요청
       final token = await getToken();
-      final response = await http.get(
-        Uri.parse(ApiConfig.getUrl('/api/members/${localUser.memberId}')),
-        headers: {
-          'Content-Type': 'application/json',
-          if (token != null) 'Authorization': 'Bearer $token',
-        },
-      ).timeout(ApiConfig.timeout);
+      final response = await http
+          .get(
+            Uri.parse(ApiConfig.getUrl('/api/members/${localUser.memberId}')),
+            headers: {
+              'Content-Type': 'application/json',
+              if (token != null) 'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(ApiConfig.timeout);
 
       // 3. 응답 처리 및 저장
       if (response.statusCode == 200) {
@@ -320,10 +329,12 @@ class AuthService {
   Future<User?> updateProfile({
     required int memberId,
     String? name,
+    String? nickname,
     String? email,
     String? profileImage,
   }) async {
-    if ((name == null || name.trim().isEmpty) && 
+    if ((name == null || name.trim().isEmpty) &&
+        (nickname == null || nickname.trim().isEmpty) &&
         (email == null || email.trim().isEmpty) &&
         (profileImage == null || profileImage.trim().isEmpty)) {
       throw Exception('수정할 정보가 없습니다.');
@@ -333,6 +344,9 @@ class AuthService {
     final body = <String, dynamic>{};
     if (name != null && name.trim().isNotEmpty) {
       body['member_name'] = name.trim();
+    }
+    if (nickname != null && nickname.trim().isNotEmpty) {
+      body['nickname'] = nickname.trim();
     }
     if (email != null && email.trim().isNotEmpty) {
       body['email'] = email.trim();
@@ -388,16 +402,16 @@ class AuthService {
         return false;
       }
 
-      final response = await http.put(
-        Uri.parse(ApiConfig.getUrl('/api/members/$memberId/calorie-goal')),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'calorie_goal': calorieGoal,
-        }),
-      ).timeout(ApiConfig.timeout);
+      final response = await http
+          .put(
+            Uri.parse(ApiConfig.getUrl('/api/members/$memberId/calorie-goal')),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode({'calorie_goal': calorieGoal}),
+          )
+          .timeout(ApiConfig.timeout);
 
       if (response.statusCode == 200) {
         print('✅ 칼로리 목표 업데이트 성공: $calorieGoal kcal');
@@ -423,13 +437,15 @@ class AuthService {
   Future<String?> uploadProfileImage(XFile imageFile) async {
     try {
       final token = await getToken();
-      final uri = Uri.parse(ApiConfig.getUrl('/api/members/upload-profile-image'));
-      
+      final uri = Uri.parse(
+        ApiConfig.getUrl('/api/members/upload-profile-image'),
+      );
+
       final request = http.MultipartRequest('POST', uri);
       if (token != null) {
         request.headers['Authorization'] = 'Bearer $token';
       }
-      
+
       final bytes = await imageFile.readAsBytes();
       final multipartFile = http.MultipartFile.fromBytes(
         'file',
@@ -437,10 +453,10 @@ class AuthService {
         filename: imageFile.name,
       );
       request.files.add(multipartFile);
-      
+
       final streamedResponse = await request.send().timeout(ApiConfig.timeout);
       final response = await http.Response.fromStream(streamedResponse);
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final imageUrl = data['imageUrl'] as String;
@@ -466,7 +482,9 @@ class AuthService {
         return false;
       }
 
-      final url = Uri.parse(ApiConfig.getUrl('/api/members/$memberId/calorie-goal'));
+      final url = Uri.parse(
+        ApiConfig.getUrl('/api/members/$memberId/calorie-goal'),
+      );
       final response = await http.put(
         url,
         headers: {
@@ -497,11 +515,12 @@ class AuthService {
   /// 친구 목록 조회
   Future<List<User>> getFriends(int memberId) async {
     try {
-      final url = Uri.parse('${ApiConfig.baseUrl}/api/members/$memberId/friends');
-      final response = await http.get(
-        url,
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(ApiConfig.timeout);
+      final url = Uri.parse(
+        '${ApiConfig.baseUrl}/api/members/$memberId/friends',
+      );
+      final response = await http
+          .get(url, headers: {'Content-Type': 'application/json'})
+          .timeout(ApiConfig.timeout);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);

@@ -22,6 +22,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _nicknameController = TextEditingController();
   final _emailController = TextEditingController();
   final _currentPasswordController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -34,7 +35,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   bool _isSavingProfile = false;
   bool _isChangingPassword = false;
   bool _isEditingBasicInfo = false;
-  
+
   XFile? _selectedProfileImage;
   final ImagePicker _imagePicker = ImagePicker();
 
@@ -47,6 +48,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _nicknameController.dispose();
     _emailController.dispose();
     _currentPasswordController.dispose();
     _passwordController.dispose();
@@ -61,34 +63,40 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       if (localUser != null) {
         setState(() {
           _currentUser = localUser;
+          _nicknameController.text = localUser.nickname ?? '';
           _nameController.text = localUser.memberName ?? '';
           _emailController.text = localUser.email;
         });
       }
-      
+
       // 서버에서 최신 정보 가져오기 (프로필 이미지 포함)
       if (localUser != null) {
-        final response = await http.get(
-          Uri.parse(ApiConfig.getUrl('/api/members/${localUser.memberId}')),
-          headers: {
-            'Content-Type': 'application/json',
-            if (await _authService.getToken() != null) 
-              'Authorization': 'Bearer ${await _authService.getToken()}',
-          },
-        ).timeout(ApiConfig.timeout);
-        
+        final response = await http
+            .get(
+              Uri.parse(ApiConfig.getUrl('/api/members/${localUser.memberId}')),
+              headers: {
+                'Content-Type': 'application/json',
+                if (await _authService.getToken() != null)
+                  'Authorization': 'Bearer ${await _authService.getToken()}',
+              },
+            )
+            .timeout(ApiConfig.timeout);
+
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body) as Map<String, dynamic>;
           final updatedUser = User.fromJson(data);
           await _authService.saveUserLocally(updatedUser);
-          
+
           if (!mounted) return;
           setState(() {
             _currentUser = updatedUser;
+            _nicknameController.text = updatedUser.nickname ?? '';
             _nameController.text = updatedUser.memberName ?? '';
             _emailController.text = updatedUser.email;
           });
-          print('✅ 서버에서 최신 사용자 정보 로드: profileImage=${updatedUser.profileImage}');
+          print(
+            '✅ 서버에서 최신 사용자 정보 로드: profileImage=${updatedUser.profileImage}',
+          );
         }
       }
     } catch (e) {
@@ -109,16 +117,16 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         maxHeight: 512,
         imageQuality: 85,
       );
-      
+
       print('🖼️ 선택된 이미지: ${image?.path ?? "null"}');
-      
+
       if (image != null) {
         setState(() {
           _selectedProfileImage = image;
         });
-        
+
         print('✅ _selectedProfileImage 업데이트됨: $_selectedProfileImage');
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -134,10 +142,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       print('❌ 이미지 선택 오류: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('이미지 선택 실패: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('이미지 선택 실패: $e'), backgroundColor: Colors.red),
         );
       }
     }
@@ -162,11 +167,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         shape: BoxShape.circle,
         color: Colors.grey[300],
       ),
-      child: const Icon(
-        Icons.person,
-        size: 50,
-        color: Colors.white,
-      ),
+      child: const Icon(Icons.person, size: 50, color: Colors.white),
     );
   }
 
@@ -185,14 +186,16 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   }
 
   String? _validateConfirmPassword(String? value) {
-    if (_passwordController.text.isNotEmpty && value != _passwordController.text) {
+    if (_passwordController.text.isNotEmpty &&
+        value != _passwordController.text) {
       return '비밀번호가 일치하지 않습니다';
     }
     return null;
   }
 
   String? _validateCurrentPassword(String? value) {
-    if (_passwordController.text.isNotEmpty && (value == null || value.isEmpty)) {
+    if (_passwordController.text.isNotEmpty &&
+        (value == null || value.isEmpty)) {
       return '현재 비밀번호를 입력해주세요';
     }
     return null;
@@ -224,10 +227,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     final passwordError = _validatePassword(_passwordController.text);
     if (passwordError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(passwordError),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(passwordError), backgroundColor: Colors.red),
       );
       return;
     }
@@ -279,21 +279,30 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     }
 
     final newName = _nameController.text.trim();
+    final newNickname = _nicknameController.text.trim();
     final newEmail = _emailController.text.trim();
 
     final currentName = _currentUser!.memberName ?? '';
+    final currentNickname = _currentUser!.nickname ?? '';
     final currentEmail = _currentUser!.email;
 
     final nameChanged = newName.isNotEmpty && newName != currentName;
+    final nicknameChanged =
+        newNickname.isNotEmpty && newNickname != currentNickname;
     final emailChanged = newEmail.isNotEmpty && newEmail != currentEmail;
     final imageChanged = _selectedProfileImage != null;
 
     print('🔍 프로필 저장 체크:');
     print('  - nameChanged: $nameChanged (현재: $currentName, 새: $newName)');
+    print(
+      '  - nicknameChanged: $nicknameChanged (현재: $currentNickname, 새: $newNickname)',
+    );
     print('  - emailChanged: $emailChanged (현재: $currentEmail, 새: $newEmail)');
-    print('  - imageChanged: $imageChanged (_selectedProfileImage: $_selectedProfileImage)');
+    print(
+      '  - imageChanged: $imageChanged (_selectedProfileImage: $_selectedProfileImage)',
+    );
 
-    if (!nameChanged && !emailChanged && !imageChanged) {
+    if (!nameChanged && !nicknameChanged && !emailChanged && !imageChanged) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('변경된 항목이 없습니다'),
@@ -307,11 +316,13 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       setState(() => _isSavingProfile = true);
 
       String? uploadedImageUrl;
-      
+
       // 이미지가 선택되었으면 먼저 업로드
       if (imageChanged) {
         print('🖼️ 프로필 이미지 업로드 시작...');
-        uploadedImageUrl = await _authService.uploadProfileImage(_selectedProfileImage!);
+        uploadedImageUrl = await _authService.uploadProfileImage(
+          _selectedProfileImage!,
+        );
         if (uploadedImageUrl == null) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
@@ -329,12 +340,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       print('💾 프로필 업데이트 시작...');
       print('  - memberId: ${_currentUser!.memberId}');
       print('  - name: ${nameChanged ? newName : null}');
+      print('  - nickname: ${nicknameChanged ? newNickname : null}');
       print('  - email: ${emailChanged ? newEmail : null}');
       print('  - profileImage: $uploadedImageUrl');
-      
+
       final updatedUser = await _authService.updateProfile(
         memberId: _currentUser!.memberId,
         name: nameChanged ? newName : null,
+        nickname: nicknameChanged ? newNickname : null,
         email: emailChanged ? newEmail : null,
         profileImage: uploadedImageUrl,
       );
@@ -346,8 +359,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       setState(() {
         _currentUser = updatedUser ?? _currentUser;
         _nameController.text = _currentUser?.memberName ?? '';
+        _nicknameController.text = _currentUser?.nickname ?? '';
         _emailController.text = _currentUser?.email ?? '';
-        _selectedProfileImage = null;  // 저장 후 선택된 이미지 초기화
+        _selectedProfileImage = null; // 저장 후 선택된 이미지 초기화
         _isEditingBasicInfo = false;
         _isSavingProfile = false;
       });
@@ -361,7 +375,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
       // 화면을 닫기 전에 서버에서 최신 정보 로드하여 화면 갱신
       await _loadUser();
-      
+
       if (mounted) {
         Navigator.pop(context, true); // true를 반환하여 이전 화면에 알림
       }
@@ -518,8 +532,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       decoration: InputDecoration(
                         hintText: '이름을 입력하세요',
                         filled: true,
-                        fillColor:
-                            _isEditingBasicInfo ? Colors.grey[50] : Colors.grey[200],
+                        fillColor: _isEditingBasicInfo
+                            ? Colors.grey[50]
+                            : Colors.grey[200],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -532,6 +547,41 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return '이름을 입력해주세요';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      '닉네임',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _nicknameController,
+                      enabled: _isEditingBasicInfo,
+                      decoration: InputDecoration(
+                        hintText: '닉네임을 입력하세요',
+                        filled: true,
+                        fillColor: _isEditingBasicInfo
+                            ? Colors.grey[50]
+                            : Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return '닉네임을 입력해주세요';
                         }
                         return null;
                       },
@@ -553,8 +603,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       decoration: InputDecoration(
                         hintText: 'email@example.com',
                         filled: true,
-                        fillColor:
-                            _isEditingBasicInfo ? Colors.grey[50] : Colors.grey[200],
+                        fillColor: _isEditingBasicInfo
+                            ? Colors.grey[50]
+                            : Colors.grey[200],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -622,7 +673,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscureCurrentPassword = !_obscureCurrentPassword;
+                              _obscureCurrentPassword =
+                                  !_obscureCurrentPassword;
                             });
                           },
                         ),
@@ -662,7 +714,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                             color: Colors.grey[400],
                           ),
                           onPressed: () {
-                            setState(() => _obscurePassword = !_obscurePassword);
+                            setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            );
                           },
                         ),
                       ),
@@ -702,7 +756,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                           ),
                           onPressed: () {
                             setState(
-                              () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                              () => _obscureConfirmPassword =
+                                  !_obscureConfirmPassword,
                             );
                           },
                         ),
@@ -730,7 +785,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
                                 ),
                               )
                             : const Text(
@@ -764,7 +821,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
                                 ),
                               )
                             : const Text(

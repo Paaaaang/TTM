@@ -45,6 +45,7 @@ class CustomTextField extends StatelessWidget {
       maxLength: maxLength,
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: TextStyle(color: Colors.grey[400]),
         filled: true,
         fillColor: Colors.grey[50],
         counterText: maxLength != null ? '' : null,
@@ -60,7 +61,10 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Color(0xFF66BB6A), width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         suffixIcon: suffixIcon,
       ),
     );
@@ -95,10 +99,7 @@ class CustomDropdown extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<int>(
           value: value,
-          hint: Text(
-            hint,
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          hint: Text(hint, style: TextStyle(color: Colors.grey[600])),
           isExpanded: true,
           icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
           items: items.map((item) {
