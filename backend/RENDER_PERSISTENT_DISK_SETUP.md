@@ -5,6 +5,7 @@
 Render Dashboard → Storage → New Persistent Disk
 
 **설정:**
+
 - Name: `ttm-ai-models`
 - Size: `3 GB` (YOLO 247MB + ResNet 85MB + 여유공간)
 - Region: 서비스와 동일 리전 선택
@@ -14,6 +15,7 @@ Render Dashboard → Storage → New Persistent Disk
 Web Service → Settings → Disks
 
 **Mount 설정:**
+
 - Disk: `ttm-ai-models`
 - Mount Path: `/var/data`
 
@@ -59,11 +61,13 @@ RESNET_MODEL_DRIVE_ID=1ROaLfNs40PyESJTBP3b2bN0p_oeg46HH
 ## 5. 메모리 최적화 전략 (2GB 제한)
 
 **모델 로드 순서:**
+
 1. ResNet만 로드 (85MB) - 양 추정용
 2. YOLO 로드 시도 (247MB + inference 메모리)
 3. 메모리 부족 시 YOLO는 Mock 데이터 사용
 
 **권장 설정:**
+
 ```bash
 # Render 환경 변수
 WEB_CONCURRENCY=1           # 단일 워커
@@ -74,7 +78,7 @@ MAX_REQUESTS=1000          # 메모리 누수 방지
 
 ## 6. 배포 플로우
 
-1. 첫 배포 시: 
+1. 첫 배포 시:
    - Persistent Disk 비어있음
    - startup에서 Google Drive 다운로드 (약 3-5분)
    - 파일 검증 후 완료
