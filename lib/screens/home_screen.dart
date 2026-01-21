@@ -542,7 +542,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             '영양 점수 ${member.nutritionScore}점',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey[600],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -551,7 +551,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close),
-                      color: Colors.grey[600],
+                      color: AppColors.textSecondary,
                     ),
                   ],
                 ),
@@ -559,9 +559,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: AppColors.softBackground,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[200]!),
+                    border: Border.all(color: AppColors.borderLight),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -573,7 +573,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             '목표 칼로리',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -593,7 +593,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             '획득 배지',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -629,7 +629,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (badges.isEmpty) {
                       return Text(
                         '획득한 배지가 없습니다',
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: TextStyle(color: AppColors.textSecondary),
                       );
                     }
 
@@ -1619,7 +1619,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Icon(
                 icon,
                 size: 18,
-                color: isActive ? AppColors.primary : Colors.grey[400],
+                color: isActive ? AppColors.primary : AppColors.borderLight,
               ),
               const SizedBox(width: 6),
               Text(
@@ -1701,7 +1701,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               _nutritionCheerText(score),
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: AppColors.textSecondary,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -1754,7 +1754,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     1.0,
                                   ),
                                   minHeight: 6,
-                                  backgroundColor: Colors.grey[200],
+                                  backgroundColor: AppColors.borderLight,
                                   valueColor:
                                       const AlwaysStoppedAnimation<Color>(
                                         Color(0xFF1DB954),
@@ -1845,7 +1845,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 '상세',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey[700],
+                                  color: AppColors.textPrimary,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -1853,7 +1853,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(
                                 Icons.chevron_right,
                                 size: 18,
-                                color: Colors.grey[700],
+                                color: AppColors.textPrimary,
                               ),
                             ],
                           ),
@@ -1870,7 +1870,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+                border: Border(bottom: BorderSide(color: AppColors.borderLight)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -2093,7 +2093,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
+          border: Border.all(color: AppColors.borderLight),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.08),
@@ -2301,8 +2301,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: _fastingStatus[type] == true
-                                              ? Colors.grey[400]
-                                              : Colors.grey[700],
+                                              ? AppColors.borderLight
+                                              : AppColors.textPrimary,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -2310,7 +2310,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Icon(
                                         Icons.add_circle_outline,
                                         color: _fastingStatus[type] == true
-                                            ? Colors.grey[400]
+                                            ? AppColors.borderLight
                                             : const Color(0xFF1DB954),
                                         size: 20,
                                       ),
@@ -2342,7 +2342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 8),
 
                       // 경계선
-                      Divider(color: Colors.grey[300], thickness: 1, height: 1),
+                      Divider(color: AppColors.borderLight, thickness: 1, height: 1),
 
                       const SizedBox(height: 8),
 
@@ -2382,7 +2382,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontSize: 14,
                                     color: _fastingStatus[type] == true
                                         ? Colors.white
-                                        : Colors.grey[700],
+                                        : AppColors.textPrimary,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -2394,7 +2394,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   size: 18,
                                   color: _fastingStatus[type] == true
                                       ? Colors.white
-                                      : Colors.grey[600],
+                                      : AppColors.textSecondary,
                                 ),
                               ],
                             ),
@@ -2462,7 +2462,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey[200]!),
+                  border: Border.all(color: AppColors.borderLight),
                 ),
                 child: const Center(
                   child: Column(
@@ -2637,7 +2637,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey[200]!),
+                      border: Border.all(color: AppColors.borderLight),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2661,7 +2661,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     exercise.durationFormatted,
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.grey[600],
+                                      color: AppColors.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -2685,7 +2685,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             exercise.memo!,
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey[600],
+                              color: AppColors.textSecondary,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -2722,25 +2722,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey[200]!),
+                  border: Border.all(color: AppColors.borderLight),
                 ),
                 child: Center(
                   child: Column(
                     children: [
-                      Icon(Icons.group_add, size: 60, color: Colors.grey[300]),
+                      Icon(Icons.group_add, size: 60, color: AppColors.borderLight),
                       const SizedBox(height: 16),
                       Text(
                         '그룹이 없습니다',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey[600],
+                          color: AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '친구들과 함께하는 그룹을 만들어보세요',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                       ),
                     ],
                   ),
@@ -2776,7 +2776,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           border: Border.all(
                             color: isSelected
                                 ? const Color(0xFF1DB954).withOpacity(0.6)
-                                : Colors.grey[300]!,
+                                : AppColors.borderLight,
                             width: 1,
                           ),
                         ),
@@ -2804,7 +2804,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 11,
                                 color: isSelected
                                     ? const Color(0xFF1DB954)
-                                    : Colors.grey[600],
+                                    : AppColors.textSecondary,
                               ),
                             ),
                           ],
@@ -2827,13 +2827,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey[200]!),
+                  border: Border.all(color: AppColors.borderLight),
                 ),
                 child: Column(
                   children: [
                     Text(
                       _groupMembersError!,
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 8),
                     TextButton(
@@ -2851,11 +2851,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey[200]!),
+                  border: Border.all(color: AppColors.borderLight),
                 ),
                 child: Text(
                   '그룹 멤버가 없습니다',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
               )
             else
@@ -2911,7 +2911,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.grey[200]!),
+                        border: Border.all(color: AppColors.borderLight),
                       ),
                       child: InkWell(
                         onTap: () => _showMemberDetailDialog(member),
@@ -2942,7 +2942,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       '영양 점수 ${member.nutritionScore}점',
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: Colors.grey[600],
+                                        color: AppColors.textSecondary,
                                       ),
                                     ),
                                   ],
@@ -2950,7 +2950,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               Icon(
                                 Icons.chevron_right,
-                                color: Colors.grey[400],
+                                color: AppColors.borderLight,
                               ),
                             ],
                           ),

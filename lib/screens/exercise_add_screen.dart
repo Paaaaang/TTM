@@ -1,6 +1,7 @@
 /// 운동 기록 추가 화면
 /// ExerciseDetailScreen.tsx를 Flutter로 변환
 import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 import 'package:ttm/services/exercise_service.dart';
 import 'package:ttm/services/auth_service.dart';
 import 'package:ttm/models/exercise_log.dart';
@@ -144,12 +145,12 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: AppColors.softBackground,
       resizeToAvoidBottomInset: true, // 키보드가 올라올 때 자동으로 화면 조정
       appBar: AppBar(
         title: const Text('운동 추가'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.background,
         actions: [
           if (_selectedExercises.isNotEmpty)
             if (_isSaving)
@@ -193,7 +194,7 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
                 hintText: '운동 검색...',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor: AppColors.softBackground,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -209,7 +210,7 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
           // 선택된 운동 목록
           if (_selectedExercises.isNotEmpty)
             Container(
-              color: Colors.blue[50],
+              color: AppColors.primaryLight,
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,16 +341,16 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
+                      color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.blue[200]!),
+                      border: Border.all(color: AppColors.primary),
                     ),
                     child: Text(
                       duration.time,
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.blue,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
@@ -366,9 +367,9 @@ class _ExerciseAddScreenState extends State<ExerciseAddScreen> {
   Color _getCategoryColor(ExerciseCategory category) {
     switch (category) {
       case ExerciseCategory.cardio:
-        return Colors.orange;
+        return AppColors.warning;
       case ExerciseCategory.strength:
-        return Colors.blue;
+        return AppColors.primary;
       case ExerciseCategory.flexibility:
         return Colors.purple;
       case ExerciseCategory.sports:

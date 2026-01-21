@@ -50,6 +50,7 @@ class AppColors {
   // ========== 상태 색상 (유지) ==========
   static const Color success = Color(0xFF4CAF50); // 성공
   static const Color warning = Color(0xFFFF9800); // 경고
+  static const Color warningBg = Color(0xFFFFF3E0); // 경고 배경
   static const Color error = Color(0xFFF44336); // 오류
   static const Color info = Color(0xFF2196F3); // 정보
 

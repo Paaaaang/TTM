@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ttm/constants/app_colors.dart';
 import '../models/user.dart';
 import '../models/post.dart';
 import '../models/meal_log.dart';
@@ -455,9 +456,9 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen>
   Color _getMealTypeColor(String type) {
     switch (type) {
       case 'BREAKFAST':
-        return Colors.orange;
+        return AppColors.warning;
       case 'LUNCH':
-        return Colors.green;
+        return AppColors.ctaMain;
       case 'DINNER':
         return Colors.blue;
       case 'SNACK':
@@ -760,9 +761,9 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen>
   Color _getCategoryColor(String category) {
     switch (category) {
       case 'DIET':
-        return Colors.orange;
+        return AppColors.warning;
       case 'EXERCISE':
-        return Colors.blue;
+        return AppColors.primary;
       case 'LIFESTYLE':
         return Colors.purple;
       case 'FREE':

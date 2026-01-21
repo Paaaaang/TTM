@@ -1,5 +1,6 @@
 /// 친구 목록 화면
 import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 import 'package:ttm/models/user.dart';
 import 'package:ttm/services/auth_service.dart';
 import 'package:ttm/widgets/profile_avatar.dart';
@@ -89,11 +90,11 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: AppColors.softBackground,
       appBar: AppBar(
         title: const Text('친구 목록'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
         actions: [
           IconButton(
@@ -132,7 +133,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor: AppColors.softBackground,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -152,7 +153,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
                   '친구 ${_filteredFriends.length}명',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[600],
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -172,14 +173,14 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
                         Icon(
                           Icons.error_outline,
                           size: 48,
-                          color: Colors.grey[400],
+                          color: AppColors.borderLight,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           _errorMessage!,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[600],
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ],
@@ -193,14 +194,14 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
                         Icon(
                           Icons.people_outline,
                           size: 64,
-                          color: Colors.grey[400],
+                          color: AppColors.borderLight,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           _searchQuery.isEmpty ? '친구가 없습니다' : '검색 결과가 없습니다',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -342,7 +343,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
                 const SizedBox(height: 4),
                 Text(
                   friend.memberName ?? friend.email,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -350,7 +351,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
 
           // 버튼들
           PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: Colors.grey[600]),
+            icon: Icon(Icons.more_vert, color: AppColors.textSecondary),
             onSelected: (value) {
               switch (value) {
                 case 'profile':

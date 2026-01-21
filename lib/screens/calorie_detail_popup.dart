@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 import '../services/auth_service.dart';
 import '../models/user.dart';
 
@@ -420,13 +421,13 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
                         return Row(
                           children: [
                             Expanded(
-                              child: _buildNutrientColumn('탄수화물', widget.totalCarbs.toInt(), targetCarbs, Colors.blue),
+                              child: _buildNutrientColumn('탄수화물', widget.totalCarbs.toInt(), targetCarbs, AppColors.carbs),
                             ),
                             Expanded(
-                              child: _buildNutrientColumn('단백질', widget.totalProtein.toInt(), targetProtein, Colors.orange),
+                              child: _buildNutrientColumn('단백질', widget.totalProtein.toInt(), targetProtein, AppColors.protein),
                             ),
                             Expanded(
-                              child: _buildNutrientColumn('지방', widget.totalFat.toInt(), targetFat, Colors.red),
+                              child: _buildNutrientColumn('지방', widget.totalFat.toInt(), targetFat, AppColors.fat),
                             ),
                           ],
                         );
@@ -594,11 +595,11 @@ class _CalorieDetailPopupState extends State<CalorieDetailPopup> {
           // 영양소 정보 (탄단지)
           Row(
             children: [
-              _buildNutrientBadge('탄', carbs, Colors.blue),
+              _buildNutrientBadge('탄', carbs, AppColors.carbs),
               const SizedBox(width: 4),
-              _buildNutrientBadge('단', protein, Colors.orange),
+              _buildNutrientBadge('단', protein, AppColors.protein),
               const SizedBox(width: 4),
-              _buildNutrientBadge('지', fat, Colors.red),
+              _buildNutrientBadge('지', fat, AppColors.fat),
             ],
           ),
         ],

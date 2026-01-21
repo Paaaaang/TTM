@@ -51,14 +51,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           const Icon(
                             Icons.arrow_back,
                             size: 20,
-                            color: Colors.black54,
+                            color: AppColors.textSecondary,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             '뒤로',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey[600],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -84,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black87,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -112,14 +112,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             hintText: '아이디를 입력해주세요',
                             filled: true,
-                            fillColor: Colors.grey[50],
+                            fillColor: AppColors.softBackground,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderSide: BorderSide(color: AppColors.borderLight),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderSide: BorderSide(color: AppColors.borderLight),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -143,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black87,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -153,14 +153,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             hintText: '비밀번호',
                             filled: true,
-                            fillColor: Colors.grey[50],
+                            fillColor: AppColors.softBackground,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderSide: BorderSide(color: AppColors.borderLight),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderSide: BorderSide(color: AppColors.borderLight),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -178,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _showPassword
                                     ? Icons.visibility
                                     : Icons.visibility_off,
-                                color: Colors.grey[600],
+                                color: AppColors.textSecondary,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -223,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: Divider(color: Colors.grey[300], thickness: 1),
+                          child: Divider(color: AppColors.borderLight, thickness: 1),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -231,12 +231,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             '또는',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ),
                         Expanded(
-                          child: Divider(color: Colors.grey[300], thickness: 1),
+                          child: Divider(color: AppColors.borderLight, thickness: 1),
                         ),
                       ],
                     ),
@@ -253,8 +253,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: OutlinedButton(
                             onPressed: _handleKakaoLogin,
                             style: OutlinedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFEE500),
-                              foregroundColor: Colors.black87,
+                              backgroundColor: AppColors.kakao,
+                              foregroundColor: AppColors.textPrimary,
                               side: BorderSide.none,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -290,8 +290,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: OutlinedButton(
                             onPressed: _handleNaverLogin,
                             style: OutlinedButton.styleFrom(
-                              backgroundColor: const Color(0xFF03C75A),
-                              foregroundColor: Colors.white,
+                              backgroundColor: AppColors.naver,
+                              foregroundColor: AppColors.background,
                               side: BorderSide.none,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -313,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w900,
-                                        color: Color(0xFF03C75A),
+                                        color: AppColors.naver,
                                       ),
                                     ),
                                   ),
@@ -340,9 +340,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: OutlinedButton(
                             onPressed: _handleGoogleLogin,
                             style: OutlinedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.black87,
-                              side: BorderSide(color: Colors.grey[300]!),
+                              backgroundColor: AppColors.background,
+                              foregroundColor: AppColors.textPrimary,
+                              side: BorderSide(color: AppColors.borderLight),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -353,7 +353,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const FaIcon(
                                   FontAwesomeIcons.google,
                                   size: 20,
-                                  color: Color(0xFF4285F4),
+                                  color: AppColors.google,
                                 ),
                                 const SizedBox(width: 8),
                                 const Text(

@@ -191,7 +191,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
             ),
             if (_isLoading)
               Container(
-                color: Colors.black26,
+                color: AppColors.textSecondary.withOpacity(0.5),
                 child: const Center(child: CircularProgressIndicator()),
               ),
           ],
@@ -235,13 +235,13 @@ class _SurveyScreenState extends State<SurveyScreen> {
                 height: 56,
                 child: TextButton.icon(
                   onPressed: _prevPage,
-                  icon: const Icon(Icons.arrow_back, color: Colors.grey),
+                  icon: const Icon(Icons.arrow_back, color: AppColors.textSecondary),
                   label: const Text(
                     '뒤로 가기',
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
                   ),
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: AppColors.softBackground,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -270,7 +270,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
             const SizedBox(height: 8),
             const Text(
               '더 정확한 영양 분석을 위해 필요해요',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 48),
 
@@ -403,12 +403,12 @@ class _SurveyScreenState extends State<SurveyScreen> {
             const SizedBox(height: 8),
             const Text(
               '맞춤 영양 관리를 위해 필요해요',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 4),
             const Text(
               '중복 선택 가능',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 48),
 
@@ -431,8 +431,8 @@ class _SurveyScreenState extends State<SurveyScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF3E0), // 오렌지 배경
-                  border: Border.all(color: const Color(0xFFFF9800), width: 1),
+                  color: AppColors.warningBg,
+                  border: Border.all(color: AppColors.warning, width: 1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -442,7 +442,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                       children: [
                         Icon(
                           Icons.warning_amber,
-                          color: Color(0xFFFF9800),
+                          color: AppColors.warning,
                           size: 20,
                         ),
                         SizedBox(width: 8),
@@ -451,7 +451,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFE65100),
+                            color: AppColors.warning,
                           ),
                         ),
                       ],
@@ -489,10 +489,10 @@ class _SurveyScreenState extends State<SurveyScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFF9800) : Colors.white, // 주황색
+          color: isSelected ? AppColors.warning : AppColors.background,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFFFF9800) : Colors.grey[400]!,
+            color: isSelected ? AppColors.warning : AppColors.borderLight,
             width: 1.5,
           ),
         ),
@@ -507,7 +507,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : Colors.grey[700],
+                color: isSelected ? AppColors.background : AppColors.textPrimary,
               ),
             ),
           ],
@@ -558,11 +558,11 @@ class _SurveyScreenState extends State<SurveyScreen> {
         height: 56,
         decoration: BoxDecoration(
           color: isSelected
-              ? (isAllergy ? const Color(0xFFFFF3E0) : AppColors.primaryLight)
-              : Colors.white,
+              ? (isAllergy ? AppColors.warningBg : AppColors.primaryLight)
+              : AppColors.background,
           border: Border.all(
             color: isSelected
-                ? (isAllergy ? const Color(0xFFFF9800) : AppColors.primary)
+                ? (isAllergy ? AppColors.warning : AppColors.primary)
                 : AppColors.borderLight,
             width: 2,
           ),
@@ -575,7 +575,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: isSelected
-                ? (isAllergy ? const Color(0xFFE65100) : AppColors.primaryDark)
+                ? (isAllergy ? AppColors.warning : AppColors.primaryDark)
                 : AppColors.textSecondary,
           ),
         ),
