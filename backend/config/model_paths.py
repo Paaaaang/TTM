@@ -5,10 +5,29 @@ AI 모델 경로 설정
 import os
 from pathlib import Path
 
-# 환경 변수에서 base path 읽기
-# 로컬: backend/ai_models
-# Render: /var/data/ai_models (Persistent Disk)
-AI_MODELS_BASE = Path(os.getenv("AI_MODELS_BASE_PATH", str(Path(__file__).parent.parent / "ai_models")))
+# 환경 변수에서 base path 읽기 (fallback 지원)
+# 우선순위: 환경변수 > /var/data (쓰기 가능 시) > 로컬
+def get_models_base_path():
+    env_path = os.getenv("AI_MODELS_BASE_PATH")
+    if env_path:
+        return Path(env_path)
+    
+    # /var/data 쓰기 가능 확인
+    var_data = Path("/var/data/ai_models")
+    try:
+        var_data.mkdir(parents=True, exist_ok=True)
+        # 쓰기 테스트
+        test_file = var_data / ".write_test"
+        test_file.touch()
+        test_file.unlink()
+        return var_data
+    except (PermissionError, OSError):
+        pass
+    
+    # fallback: 로컬 경로
+    return Path(__file__).parent.parent / "ai_models"
+
+AI_MODELS_BASE = get_models_base_path()
 
 # YOLO 모델 경로
 YOLO_DIR = AI_MODELS_BASE / "Food_classification" / "yolov3"
