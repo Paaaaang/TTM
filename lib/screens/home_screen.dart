@@ -1170,7 +1170,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: AppColors.softBackground,
       body: Stack(
         children: [
           Column(
@@ -1277,7 +1277,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final difference = selectedDateOnly.difference(nowDate).inDays;
 
     return Container(
-      decoration: const BoxDecoration(color: Color(0xFF1DB954)),
+      decoration: const BoxDecoration(color: AppColors.primary),
       child: SafeArea(
         bottom: false,
         child: Column(
@@ -1608,7 +1608,7 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isActive ? const Color(0xFF1DB954) : Colors.transparent,
+                color: isActive ? AppColors.primary : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -1619,7 +1619,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Icon(
                 icon,
                 size: 18,
-                color: isActive ? const Color(0xFF1DB954) : Colors.grey[400],
+                color: isActive ? AppColors.primary : Colors.grey[400],
               ),
               const SizedBox(width: 6),
               Text(
@@ -1627,7 +1627,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-                  color: isActive ? Colors.black87 : Colors.grey[600],
+                  color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
                 ),
               ),
             ],
