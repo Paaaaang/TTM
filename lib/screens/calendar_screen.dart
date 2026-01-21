@@ -17,19 +17,19 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   /// 현재 선택된 월
   DateTime _currentMonth = DateTime.now();
-  
+
   /// 선택된 날짜
   DateTime? _selectedDate;
-  
+
   /// 서비스
   final AuthService _authService = AuthService();
-  
+
   /// 현재 사용자
   User? _currentUser;
-  
+
   /// 날짜별 영양 점수 (날짜 -> 점수)
   Map<String, int> _nutritionScores = {};
-  
+
   /// 로딩 상태
   bool _isLoading = false;
 
@@ -38,7 +38,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     super.initState();
     _loadUserInfo();
   }
-  
+
   /// 사용자 정보 로드
   Future<void> _loadUserInfo() async {
     final user = await _authService.getCurrentUser();
@@ -49,28 +49,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
       _loadMonthScores();
     }
   }
-  
+
   /// 월별 영양 점수 로드
   Future<void> _loadMonthScores() async {
     if (_currentUser == null) return;
-    
+
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
-      final response = await http.get(
-        Uri.parse(ApiConfig.getUrl(
-          '/api/meals/nutrition-scores/${_currentUser!.memberId}'
-          '?year=${_currentMonth.year}&month=${_currentMonth.month}'
-        )),
-        headers: {'Content-Type': 'application/json'},
-      ).timeout(ApiConfig.timeout);
+      final response = await http
+          .get(
+            Uri.parse(
+              ApiConfig.getUrl(
+                '/api/meals/nutrition-scores/${_currentUser!.memberId}'
+                '?year=${_currentMonth.year}&month=${_currentMonth.month}',
+              ),
+            ),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(ApiConfig.timeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final scores = data['scores'] as Map<String, dynamic>;
-        
+
         if (mounted) {
           setState(() {
             _nutritionScores = scores.map((key, value) {
@@ -96,7 +100,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       }
     }
   }
-  
+
   /// 이전 달로 이동
   void _previousMonth() {
     setState(() {
@@ -104,7 +108,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
     _loadMonthScores();
   }
-  
+
   /// 다음 달로 이동
   void _nextMonth() {
     setState(() {
@@ -112,7 +116,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
     _loadMonthScores();
   }
-  
+
   /// 날짜 선택
   void _selectDate(DateTime date) {
     setState(() {
@@ -121,37 +125,37 @@ class _CalendarScreenState extends State<CalendarScreen> {
     // 선택된 날짜로 홈 화면으로 돌아가기
     Navigator.pop(context, date);
   }
-  
+
   /// 해당 월의 첫 번째 날
   DateTime get _firstDayOfMonth {
     return DateTime(_currentMonth.year, _currentMonth.month, 1);
   }
-  
+
   /// 해당 월의 마지막 날
   DateTime get _lastDayOfMonth {
     return DateTime(_currentMonth.year, _currentMonth.month + 1, 0);
   }
-  
+
   /// 캘린더 그리드 생성
   List<DateTime?> get _calendarDays {
     List<DateTime?> days = [];
-    
+
     // 첫 번째 날의 요일 (일요일=7, 월요일=1)
     int firstWeekday = _firstDayOfMonth.weekday;
-    
+
     // 일요일을 0으로 만들기 (월요일=1 -> 일요일=0)
     if (firstWeekday == 7) firstWeekday = 0;
-    
+
     // 앞쪽 빈 칸 추가
     for (int i = 0; i < firstWeekday; i++) {
       days.add(null);
     }
-    
+
     // 날짜 추가
     for (int day = 1; day <= _lastDayOfMonth.day; day++) {
       days.add(DateTime(_currentMonth.year, _currentMonth.month, day));
     }
-    
+
     return days;
   }
 
@@ -192,7 +196,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
     );
   }
-  
+
   /// 월 선택 헤더
   Widget _buildMonthHeader() {
     return Container(
@@ -223,11 +227,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
     );
   }
-  
+
   /// 요일 헤더
   Widget _buildWeekdayHeader() {
     const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       color: Colors.white,
@@ -241,11 +245,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: day == '일' 
+                  color: day == '일'
                       ? Colors.red[400]
                       : day == '토'
-                          ? Colors.blue[400]
-                          : Colors.grey[700],
+                      ? Colors.blue[400]
+                      : Colors.grey[700],
                 ),
               ),
             ),
@@ -254,11 +258,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
     );
   }
-  
+
   /// 캘린더 그리드
   Widget _buildCalendarGrid() {
     final days = _calendarDays;
-    
+
     return GridView.builder(
       padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -271,29 +275,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
         if (date == null) {
           return const SizedBox();
         }
-        
+
         return _buildDayCell(date);
       },
     );
   }
-  
+
   /// 날짜 셀
   Widget _buildDayCell(DateTime date) {
-    final dateKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    final dateKey =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
     final score = _nutritionScores[dateKey] ?? 0;
     final hasScore = score > 0;
-    
-    final isToday = DateTime.now().year == date.year &&
+
+    final isToday =
+        DateTime.now().year == date.year &&
         DateTime.now().month == date.month &&
         DateTime.now().day == date.day;
-    
-    final isSelected = _selectedDate?.year == date.year &&
+
+    final isSelected =
+        _selectedDate?.year == date.year &&
         _selectedDate?.month == date.month &&
         _selectedDate?.day == date.day;
-    
+
     // 영양 점수 기반 채우기 비율 (0~100점 기준)
     final fillRatio = hasScore ? (score / 100).clamp(0.0, 1.0) : 0.0;
-    
+
     // 점수에 따른 색상 변경
     Color scoreColor;
     if (score >= 80) {
@@ -305,7 +312,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     } else {
       scoreColor = const Color(0xFFFF6B6B); // 개선 필요 (빨간색 유지)
     }
-    
+
     return GestureDetector(
       onTap: () => _selectDate(date),
       child: Container(
@@ -313,9 +320,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isToday
-                ? const Color(0xFF1DB954)
-                : Colors.grey[200]!,
+            color: isToday ? const Color(0xFF1DB954) : Colors.grey[200]!,
             width: isToday ? 2 : 1,
           ),
         ),
@@ -324,10 +329,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: Stack(
             children: [
               // 배경 (흰색)
-              Container(
-                color: Colors.white,
-              ),
-              
+              Container(color: Colors.white),
+
               // 채우기 (하단에서 상단으로 그라데이션)
               if (hasScore)
                 Align(
@@ -348,13 +351,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ),
                   ),
                 ),
-              
+
               // 선택 효과
               if (isSelected)
-                Container(
-                  color: const Color(0xFF1DB954).withOpacity(0.1),
-                ),
-              
+                Container(color: const Color(0xFF1DB954).withOpacity(0.1)),
+
               // 날짜 텍스트 (중앙 상단)
               Positioned(
                 top: 8,
@@ -366,9 +367,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
-                    color: isToday
-                        ? const Color(0xFF1DB954)
-                        : Colors.black87,
+                    color: isToday ? const Color(0xFF1DB954) : Colors.black87,
                   ),
                 ),
               ),

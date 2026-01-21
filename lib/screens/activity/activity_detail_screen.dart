@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 
 /// 내 활동 상세 화면
 class ActivityDetailScreen extends StatelessWidget {
@@ -16,20 +17,14 @@ class ActivityDetailScreen extends StatelessWidget {
           elevation: 0,
           title: const Text(
             '내 활동',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           bottom: const TabBar(
             indicatorColor: Colors.white,
             indicatorWeight: 3,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
-            labelStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+            labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             tabs: [
               Tab(text: '식단'),
               Tab(text: '운동'),
@@ -53,9 +48,24 @@ class ActivityDetailScreen extends StatelessWidget {
   /// 식단 탭
   Widget _buildMealTab() {
     final meals = [
-      {'date': '2026.01.02', 'time': '아침', 'calories': 450, 'foods': '계란, 토스트, 우유'},
-      {'date': '2026.01.02', 'time': '점심', 'calories': 650, 'foods': '김치찌개, 밥, 반찬'},
-      {'date': '2026.01.01', 'time': '저녁', 'calories': 520, 'foods': '연어구이, 샐러드'},
+      {
+        'date': '2026.01.02',
+        'time': '아침',
+        'calories': 450,
+        'foods': '계란, 토스트, 우유',
+      },
+      {
+        'date': '2026.01.02',
+        'time': '점심',
+        'calories': 650,
+        'foods': '김치찌개, 밥, 반찬',
+      },
+      {
+        'date': '2026.01.01',
+        'time': '저녁',
+        'calories': 520,
+        'foods': '연어구이, 샐러드',
+      },
       {'date': '2026.01.01', 'time': '점심', 'calories': 580, 'foods': '치킨샐러드'},
       {'date': '2025.12.31', 'time': '아침', 'calories': 0, 'foods': '단식'},
     ];
@@ -66,7 +76,7 @@ class ActivityDetailScreen extends StatelessWidget {
       itemBuilder: (context, index) {
         final meal = meals[index];
         final isFasting = meal['calories'] == 0;
-        
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
@@ -166,7 +176,12 @@ class ActivityDetailScreen extends StatelessWidget {
   Widget _buildWorkoutTab() {
     final workouts = [
       {'date': '2026.01.02', 'name': '런닝', 'duration': 30, 'calories': 250},
-      {'date': '2026.01.01', 'name': '웨이트 트레이닝', 'duration': 45, 'calories': 320},
+      {
+        'date': '2026.01.01',
+        'name': '웨이트 트레이닝',
+        'duration': 45,
+        'calories': 320,
+      },
       {'date': '2025.12.31', 'name': '요가', 'duration': 60, 'calories': 180},
       {'date': '2025.12.30', 'name': '사이클', 'duration': 40, 'calories': 280},
     ];
@@ -176,7 +191,7 @@ class ActivityDetailScreen extends StatelessWidget {
       itemCount: workouts.length,
       itemBuilder: (context, index) {
         final workout = workouts[index];
-        
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
@@ -215,10 +230,7 @@ class ActivityDetailScreen extends StatelessWidget {
                   children: [
                     Text(
                       workout['date'].toString(),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -231,10 +243,7 @@ class ActivityDetailScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${workout['duration']}분',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
                     ),
                   ],
                 ),
@@ -258,9 +267,24 @@ class ActivityDetailScreen extends StatelessWidget {
   /// 커뮤니티 탭
   Widget _buildCommunityTab() {
     final posts = [
-      {'date': '2026.01.02', 'title': '다이어트 꿀팁 공유합니다', 'likes': 45, 'comments': 12},
-      {'date': '2026.01.01', 'title': '오늘 아침 런닝 인증!', 'likes': 32, 'comments': 8},
-      {'date': '2025.12.30', 'title': '저칼로리 식단 레시피', 'likes': 67, 'comments': 23},
+      {
+        'date': '2026.01.02',
+        'title': '다이어트 꿀팁 공유합니다',
+        'likes': 45,
+        'comments': 12,
+      },
+      {
+        'date': '2026.01.01',
+        'title': '오늘 아침 런닝 인증!',
+        'likes': 32,
+        'comments': 8,
+      },
+      {
+        'date': '2025.12.30',
+        'title': '저칼로리 식단 레시피',
+        'likes': 67,
+        'comments': 23,
+      },
     ];
 
     return ListView.builder(
@@ -268,7 +292,7 @@ class ActivityDetailScreen extends StatelessWidget {
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts[index];
-        
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
@@ -288,10 +312,7 @@ class ActivityDetailScreen extends StatelessWidget {
             children: [
               Text(
                 post['date'].toString(),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
               ),
               const SizedBox(height: 8),
               Text(
@@ -308,20 +329,14 @@ class ActivityDetailScreen extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     post['likes'].toString(),
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   ),
                   const SizedBox(width: 16),
                   Icon(Icons.comment, size: 16, color: Colors.grey[400]),
                   const SizedBox(width: 4),
                   Text(
                     post['comments'].toString(),
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -335,9 +350,24 @@ class ActivityDetailScreen extends StatelessWidget {
   /// 좋아요 탭
   Widget _buildLikesTab() {
     final likes = [
-      {'date': '2026.01.02', 'author': '건강왕', 'title': '아침 런닝 인증!', 'type': 'post'},
-      {'date': '2026.01.01', 'author': '다이어터', 'title': '샐러드 레시피', 'type': 'post'},
-      {'date': '2025.12.31', 'author': '요가마스터', 'title': '요가 30분 루틴', 'type': 'post'},
+      {
+        'date': '2026.01.02',
+        'author': '건강왕',
+        'title': '아침 런닝 인증!',
+        'type': 'post',
+      },
+      {
+        'date': '2026.01.01',
+        'author': '다이어터',
+        'title': '샐러드 레시피',
+        'type': 'post',
+      },
+      {
+        'date': '2025.12.31',
+        'author': '요가마스터',
+        'title': '요가 30분 루틴',
+        'type': 'post',
+      },
     ];
 
     return ListView.builder(
@@ -345,7 +375,7 @@ class ActivityDetailScreen extends StatelessWidget {
       itemCount: likes.length,
       itemBuilder: (context, index) {
         final like = likes[index];
-        
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
@@ -370,11 +400,7 @@ class ActivityDetailScreen extends StatelessWidget {
                   color: Colors.red.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.favorite,
-                  color: Colors.red,
-                  size: 20,
-                ),
+                child: const Icon(Icons.favorite, color: Colors.red, size: 20),
               ),
               const SizedBox(width: 16),
               // 정보
@@ -393,17 +419,12 @@ class ActivityDetailScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       like['title'].toString(),
-                      style: const TextStyle(
-                        fontSize: 14,
-                      ),
+                      style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       like['date'].toString(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                   ],
                 ),

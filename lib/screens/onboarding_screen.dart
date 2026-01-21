@@ -72,7 +72,10 @@ class OnboardingScreen extends StatelessWidget {
                 // 설명 텍스트
                 const Text(
                   '사진 하나로 영양정보를 빠르게 확인하세요!',
-                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
 

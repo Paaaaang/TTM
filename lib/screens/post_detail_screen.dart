@@ -33,7 +33,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   int? _currentUserId;
   int _currentImageIndex = 0;
   bool _hasChanges = false;
-  
+
   // 댓글 관련 상태
   List<Comment> _comments = [];
   Comment? _replyingTo; // 답글 작성 중인 대상 댓글
@@ -344,53 +344,74 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                       child: Builder(
                                         builder: (context) {
                                           String imageUrl;
-                                          if (image.imagePath.startsWith('http')) {
+                                          if (image.imagePath.startsWith(
+                                            'http',
+                                          )) {
                                             // 이미 완전한 URL
                                             imageUrl = image.imagePath;
-                                          } else if (image.imagePath.startsWith('/')) {
+                                          } else if (image.imagePath.startsWith(
+                                            '/',
+                                          )) {
                                             // 슬래시로 시작하는 상대 경로
-                                            imageUrl = '${ApiConstants.baseUrl}${image.imagePath}';
+                                            imageUrl =
+                                                '${ApiConstants.baseUrl}${image.imagePath}';
                                           } else {
                                             // 슬래시 없는 상대 경로
-                                            imageUrl = '${ApiConstants.baseUrl}/${image.imagePath}';
+                                            imageUrl =
+                                                '${ApiConstants.baseUrl}/${image.imagePath}';
                                           }
                                           return Image.network(
                                             imageUrl,
                                             fit: BoxFit.cover,
                                             loadingBuilder: (context, child, loadingProgress) {
-                                              if (loadingProgress == null) return child;
+                                              if (loadingProgress == null)
+                                                return child;
                                               return Container(
                                                 color: Colors.grey[200],
                                                 child: Center(
                                                   child: CircularProgressIndicator(
-                                                    value: loadingProgress.expectedTotalBytes != null
-                                                        ? loadingProgress.cumulativeBytesLoaded /
-                                                            loadingProgress.expectedTotalBytes!
+                                                    value:
+                                                        loadingProgress
+                                                                .expectedTotalBytes !=
+                                                            null
+                                                        ? loadingProgress
+                                                                  .cumulativeBytesLoaded /
+                                                              loadingProgress
+                                                                  .expectedTotalBytes!
                                                         : null,
                                                   ),
                                                 ),
                                               );
                                             },
-                                            errorBuilder: (context, error, stackTrace) {
-                                              return Container(
-                                                color: Colors.grey[200],
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.broken_image,
-                                                      size: 50,
-                                                      color: Colors.grey,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                                  return Container(
+                                                    color: Colors.grey[200],
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        const Icon(
+                                                          Icons.broken_image,
+                                                          size: 50,
+                                                          color: Colors.grey,
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 8,
+                                                        ),
+                                                        Text(
+                                                          '이미지를 불러올 수 없습니다',
+                                                          style: TextStyle(
+                                                            color: Colors
+                                                                .grey[600],
+                                                            fontSize: 12,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    const SizedBox(height: 8),
-                                                    Text(
-                                                      '이미지를 불러올 수 없습니다',
-                                                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
+                                                  );
+                                                },
                                           );
                                         },
                                       ),
@@ -543,7 +564,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: _comments.length,
-                            separatorBuilder: (context, index) => const SizedBox(height: 16),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 16),
                             itemBuilder: (context, index) {
                               return _buildCommentItem(_comments[index]);
                             },
@@ -613,7 +635,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           controller: _commentController,
                           focusNode: _commentFocusNode,
                           decoration: InputDecoration(
-                            hintText: _replyingTo != null ? '답글 추가...' : '댓글 추가...',
+                            hintText: _replyingTo != null
+                                ? '답글 추가...'
+                                : '댓글 추가...',
                             filled: true,
                             fillColor: Colors.grey[100],
                             border: OutlineInputBorder(
@@ -673,7 +697,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   /// 단일 댓글 UI (프로필, 내용, 좋아요/답글 버튼)
   Widget _buildSingleComment(Comment comment) {
-    final bool isMyComment = _currentUserId != null && comment.memberId == _currentUserId;
+    final bool isMyComment =
+        _currentUserId != null && comment.memberId == _currentUserId;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -714,7 +739,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               Text(
                 comment.content,
                 style: const TextStyle(
-                  fontSize: 14, 
+                  fontSize: 14,
                   height: 1.4,
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
@@ -736,7 +761,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                               ? Icons.favorite
                               : Icons.favorite_border,
                           size: 16,
-                          color: comment.isLiked ? Colors.red : Colors.grey[600],
+                          color: comment.isLiked
+                              ? Colors.red
+                              : Colors.grey[600],
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -764,9 +791,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     child: Text(
                       '답글 달기',
                       style: TextStyle(
-                        fontSize: 12, 
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey[600]
+                        color: Colors.grey[600],
                       ),
                     ),
                   ),
@@ -803,9 +830,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final currentUser = await _authService.getCurrentUser();
     if (currentUser == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('로그인이 필요합니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('로그인이 필요합니다')));
       }
       return;
     }
@@ -829,12 +856,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
       _commentController.clear();
       FocusScope.of(context).unfocus();
-
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('댓글 작성 실패: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('댓글 작성 실패: $e')));
       }
     }
   }
@@ -853,17 +879,19 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   Future<void> _toggleCommentLike(Comment comment) async {
     if (_currentUserId == null) {
-       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('로그인이 필요합니다')),
-       );
-       return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('로그인이 필요합니다')));
+      return;
     }
 
     final oldState = comment;
     // 낙관적 업데이트
     final newState = comment.copyWith(
       isLiked: !comment.isLiked,
-      likeCount: comment.isLiked ? comment.likeCount - 1 : comment.likeCount + 1,
+      likeCount: comment.isLiked
+          ? comment.likeCount - 1
+          : comment.likeCount + 1,
     );
 
     setState(() {
@@ -878,9 +906,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         setState(() {
           _updateCommentInList(_comments, oldState);
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('좋아요 처리에 실패했습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('좋아요 처리에 실패했습니다')));
       }
     }
   }
@@ -895,10 +923,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         title: const Text('댓글 삭제'),
         content: const Text('이 댓글을 삭제하시겠습니까?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
           TextButton(
-            onPressed: () => Navigator.pop(context, true), 
-            child: const Text('삭제', style: TextStyle(color: Colors.red))
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('삭제', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -913,9 +944,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('댓글 삭제 실패: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('댓글 삭제 실패: $e')));
       }
     }
   }
@@ -1083,25 +1114,25 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     try {
       // 삭제 API 호출
       await _postService.deletePost(widget.postId);
-      
+
       if (mounted) {
         _hasChanges = true;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(
-          content: Text('게시글이 삭제되었습니다'),
-          backgroundColor: Color(0xFF1DB954),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('게시글이 삭제되었습니다'),
+            backgroundColor: Color(0xFF1DB954),
+          ),
+        );
         Navigator.pop(context, true); // 상세 화면 닫기 (삭제 완료)
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(
-          content: Text('삭제에 실패했습니다: $e'),
-          backgroundColor: Colors.red,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('삭제에 실패했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
