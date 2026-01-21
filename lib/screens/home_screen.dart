@@ -1170,7 +1170,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.softBackground,
       body: Stack(
         children: [
           Column(
@@ -1869,10 +1869,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  bottom: BorderSide(color: AppColors.borderLight),
-                ),
+                color: AppColors.softBackground,
+                border: Border(top: BorderSide(color: AppColors.borderLight)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
