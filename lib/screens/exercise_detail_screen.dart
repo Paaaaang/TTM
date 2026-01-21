@@ -2,6 +2,7 @@
 /// WorkoutRecordDetailScreen.tsx를 Flutter로 변환
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ttm/constants/app_colors.dart';
 
 /// 운동 기록 모델
 class WorkoutRecord {
@@ -38,8 +39,8 @@ class ExerciseDetailScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF2196F3),
-              Color(0xFF1976D2),
+              AppColors.primary,
+              AppColors.primaryDark,
             ],
           ),
         ),
@@ -194,7 +195,7 @@ class ExerciseDetailScreen extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF42A5F5), Color(0xFF1E88E5)],
+          colors: [AppColors.primary, AppColors.primaryDark],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [

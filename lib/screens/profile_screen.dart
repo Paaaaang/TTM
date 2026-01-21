@@ -1,5 +1,6 @@
 ﻿/// 프로필 화면 (단일 스크롤)
 import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 import 'package:ttm/services/auth_service.dart';
 import 'package:ttm/services/badge_service.dart';
 import 'package:ttm/services/profile_service.dart';
@@ -511,10 +512,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       onTap: () => _showBadgeDetail(badge, isEarned),
       child: Container(
         decoration: BoxDecoration(
-          color: isEarned ? const Color(0xFFFFF8E1) : Colors.grey[100],
+          color: isEarned ? AppColors.warmNeutral : AppColors.softBackground,
           borderRadius: BorderRadius.circular(12),
           border: isEarned
-              ? Border.all(color: const Color(0xFFFFD54F), width: 2)
+              ? Border.all(color: AppColors.primary, width: 2)
               : null,
         ),
         child: Column(
@@ -613,7 +614,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F8F4),
+                  color: AppColors.softBackground,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

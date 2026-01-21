@@ -18,9 +18,9 @@ class OnboardingScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFE8F5E9), // 연한 민트
-              Color(0xFFF1F8E9), // 연한 연두
-              Color(0xFFE3F2FD), // 연한 하늘
+              AppColors.primaryLight, // 연한 민트
+              AppColors.softBackground, // 연한 배경
+              AppColors.primaryLight, // 연한 민트
             ],
           ),
         ),
@@ -63,7 +63,7 @@ class OnboardingScreen extends StatelessWidget {
                     fontFamily: 'BMJUA',
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF424242),
+                    color: AppColors.textPrimary,
                   ),
                 ),
 
@@ -72,7 +72,7 @@ class OnboardingScreen extends StatelessWidget {
                 // 설명 텍스트
                 const Text(
                   '사진 하나로 영양정보를 빠르게 확인하세요!',
-                  style: TextStyle(fontSize: 14, color: Color(0xFF757575)),
+                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                   textAlign: TextAlign.center,
                 ),
 
@@ -93,7 +93,7 @@ class OnboardingScreen extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      overlayColor: const Color(0xFF5CB860),
+                      overlayColor: AppColors.primary,
                     ),
                     child: const Text(
                       '로그인',

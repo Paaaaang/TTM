@@ -1,5 +1,6 @@
 // 캘린더 화면 - 월별 식단/운동 기록 확인
 import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 import 'package:ttm/services/auth_service.dart';
 import 'package:ttm/models/user.dart';
 import 'package:http/http.dart' as http;
@@ -298,7 +299,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     if (score >= 80) {
       scoreColor = const Color(0xFF1DB954); // 녹색 (우수)
     } else if (score >= 60) {
-      scoreColor = const Color(0xFF4CAF50); // 연한 녹색 (양호)
+      scoreColor = AppColors.primary; // 양호
     } else if (score >= 40) {
       scoreColor = const Color(0xFFFFA726); // 주황색 (보통)
     } else {

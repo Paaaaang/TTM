@@ -1627,7 +1627,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-                  color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
+                  color: isActive
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
                 ),
               ),
             ],

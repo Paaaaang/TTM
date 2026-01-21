@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:ttm/constants/app_colors.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import '../models/post.dart';
 import '../models/comment.dart';
@@ -415,7 +416,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: _currentImageIndex == entry.key
-                                        ? const Color(0xFF4CAF50)
+                                        ? AppColors.primary
                                         : Colors.grey[300],
                                   ),
                                 );
@@ -586,7 +587,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             'To: ${_replyingTo!.authorNickname}',
                             style: const TextStyle(
                               fontSize: 13,
-                              color: Color(0xFF4CAF50),
+                              color: AppColors.primary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -632,7 +633,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       IconButton(
                         onPressed: _submitComment,
                         icon: const Icon(Icons.send),
-                        color: const Color(0xFF4CAF50),
+                        color: AppColors.primary,
                       ),
                     ],
                   ),
