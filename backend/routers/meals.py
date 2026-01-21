@@ -579,7 +579,7 @@ async def create_meal_log(meal: MealLogRequest):
         newly_earned = []
         try:
             from services.badge_auto_award import BadgeAutoAward
-            newly_earned = BadgeAutoAward.check_and_award_badges(meal.member_id)
+            newly_earned = await BadgeAutoAward.check_and_award_badges(meal.member_id)
             if newly_earned:
                 print(f"🏅 새로운 배지 {len(newly_earned)}개 획득: {[b['badge_name'] for b in newly_earned]}")
         except Exception as badge_error:

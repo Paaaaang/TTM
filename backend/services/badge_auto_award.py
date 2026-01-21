@@ -9,7 +9,7 @@ class BadgeAutoAward:
     
     @staticmethod
     @handle_db_transaction
-    def check_and_award_badges(member_id: int, cursor=None, conn=None) -> List[Dict]:
+    async def check_and_award_badges(member_id: int, cursor=None, conn=None) -> List[Dict]:
         """
         회원의 활동을 체크하고 획득 가능한 배지를 자동으로 부여
         
