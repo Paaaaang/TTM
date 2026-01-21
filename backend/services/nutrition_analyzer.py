@@ -16,6 +16,14 @@ import numpy as np
 import cv2
 
 # ==================== 경로 설정 ====================
+# 중앙화된 경로 설정 사용
+from config.model_paths import (
+    YOLO_WEIGHTS,
+    RESNET_WEIGHTS,
+    NUTRITION_DB_PATH,
+    FOOD_CODE_MAP_PATH
+)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 AI_MODELS_DIR = BASE_DIR / "ai_models"
 YOLO_UTILS_DIR = BASE_DIR / "yolo_utils"
@@ -23,19 +31,10 @@ YOLO_UTILS_DIR = BASE_DIR / "yolo_utils"
 # 실제 모델 경로 선택 (yolo_utils > ai_models)
 MODEL_BASE_DIR = YOLO_UTILS_DIR if YOLO_UTILS_DIR.exists() else AI_MODELS_DIR
 
-# YOLO 관련 경로
+# YOLO 관련 경로 (설정/이름 파일은 로컬에만 존재)
 YOLO_DIR = MODEL_BASE_DIR / "Food_classification" / "yolov3"
-YOLO_WEIGHTS = YOLO_DIR / "weights" / "best_403food_e200b150v2.pt"
 YOLO_CFG = YOLO_DIR / "cfg" / "yolov3-spp-403cls.cfg"
 YOLO_NAMES = YOLO_DIR / "data" / "403food.names"
-
-# ResNet 관련 경로
-RESNET_WEIGHTS = MODEL_BASE_DIR / "E_of_the_a_of_food" / "quantity_est" / "weights" / "new_opencv_ckpt_b84_e200.pth"
-
-# 영양 DB 경로
-NUTRITION_DB_PATH = BASE_DIR / "data" / "Food_Classification_AI_Data_Nutrition_DB.xlsx"
-# 음식 코드 매핑 경로
-FOOD_CODE_MAP_PATH = BASE_DIR / "data" / "food_code_mapping.json"
 
 print("="*80)
 print("🚀 Nutrition Analyzer 모듈 초기화")
@@ -246,9 +245,15 @@ _class_names = None
 
 
 def load_yolo_model():
-    """YOLO 모델 로드 (싱글톤)"""
+    """
+    YOLO 모델 로드 (Lazy Loading)
+    
+    주의: services.model_loader를 사용하여 메모리 최적화
+          첫 요청 시에만 torch.load 실행
+    """
     global _yolo_model, _class_names
     
+    # 이미 로드되었으면 캐시 반환
     if _yolo_model is not None:
         return _yolo_model, _class_names
     
@@ -258,7 +263,7 @@ def load_yolo_model():
         return None, None
     
     try:
-        print("\n📦 YOLO 모델 로드 중...")
+        print("\n📦 YOLO 모델 Lazy Loading...")
         
         # 설정 파일 확인
         if not YOLO_CFG.exists():
@@ -267,6 +272,8 @@ def load_yolo_model():
         
         if not YOLO_WEIGHTS.exists():
             print(f"❌ YOLO 가중치 파일 없음: {YOLO_WEIGHTS}")
+            print(f"   경로: {YOLO_WEIGHTS}")
+            print(f"   Render Persistent Disk 마운트 확인 필요")
             return None, None
         
         # 모델 초기화
@@ -304,7 +311,11 @@ def load_yolo_model():
 
 
 def load_resnet_model():
-    """ResNet 모델 로드 (싱글톤)"""
+    """
+    ResNet 모델 로드 (Lazy Loading)
+    
+    주의: 메모리 최적화를 위해 첫 요청 시에만 torch.load
+    """
     global _resnet_model, _resnet_device
     
     if _resnet_model is not None:
@@ -313,11 +324,13 @@ def load_resnet_model():
         return _resnet_model, _resnet_device
     
     try:
-        print("\n📦 ResNet 모델 로드 중...")
+        print("\n📦 ResNet 모델 Lazy Loading...")
         
         if not RESNET_WEIGHTS.exists():
             print(f"❌ ResNet 가중치 파일 없음: {RESNET_WEIGHTS}")
-            return None
+            print(f"   경로: {RESNET_WEIGHTS}")
+            print(f"   Render Persistent Disk 마운트 확인 필요")
+            return None, None
         
         device = torch.device('cpu')
         
@@ -358,6 +371,9 @@ def load_resnet_model():
         
     except Exception as e:
         print(f"❌ ResNet 모델 로드 실패: {e}")
+        import traceback
+        traceback.print_exc()
+        return None, None
         import traceback
         traceback.print_exc()
         return None, None

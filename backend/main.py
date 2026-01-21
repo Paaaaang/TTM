@@ -52,40 +52,69 @@ app = FastAPI(
 # 서버 시작 시 실행되는 이벤트
 @app.on_event("startup")
 async def startup_event():
-    """서버 시작 시 AI 모델 미리 로드"""
+    """
+    서버 시작 시 AI 모델 파일 검증/다운로드
+    
+    주의: torch.load는 하지 않음 (메모리 최적화)
+          첫 API 요청 시 lazy loading
+    """
     print("\n" + "="*60)
-    print("🚀 서버 시작: AI 모델 사전 로딩")
+    print("🚀 서버 시작: AI 모델 파일 검증")
     print("="*60)
     
     # AI 모델 비활성화 설정 확인
     if os.getenv("DISABLE_AI_MODELS", "false").lower() == "true":
-        print("⏭️ AI 모델 로딩 스킵 (DISABLE_AI_MODELS=true)")
+        print("⏭️ AI 모델 검증 스킵 (DISABLE_AI_MODELS=true)")
+        print("="*60 + "\n")
         return
     
     try:
-        # nutrition_analyzer 모듈에서 모델 로드 함수 임포트
-        from services.nutrition_analyzer import load_yolo_model, load_resnet_model, load_nutrition_db
+        from config.model_paths import (
+            YOLO_WEIGHTS, RESNET_WEIGHTS,
+            YOLO_DRIVE_ID, RESNET_DRIVE_ID,
+            YOLO_MIN_SIZE, RESNET_MIN_SIZE
+        )
+        from utils.model_downloader import ModelDownloader
         
-        # 영양 DB 로드
-        load_nutrition_db()
+        # 모델 다운로더 생성
+        downloader = ModelDownloader()
         
-        # YOLO 모델 로드
-        yolo_model, class_names = load_yolo_model()
-        if yolo_model:
-            print("✅ YOLO 모델 사전 로딩 완료")
+        # 모델 파일 검증/다운로드 (torch.load는 안 함)
+        models_config = [
+            {
+                'name': 'yolo',
+                'drive_id': YOLO_DRIVE_ID,
+                'destination': YOLO_WEIGHTS,
+                'min_size': YOLO_MIN_SIZE
+            },
+            {
+                'name': 'resnet',
+                'drive_id': RESNET_DRIVE_ID,
+                'destination': RESNET_WEIGHTS,
+                'min_size': RESNET_MIN_SIZE
+            }
+        ]
+        
+        results = downloader.ensure_models(models_config)
+        
+        # 결과 출력
+        for model_name, success in results.items():
+            if success:
+                print(f"✅ {model_name.upper()} 모델 파일 준비 완료")
+            else:
+                print(f"❌ {model_name.upper()} 모델 파일 준비 실패")
+        
+        # 모든 모델이 준비되었는지 확인
+        if all(results.values()):
+            print("✅ 모든 AI 모델 파일 준비 완료 (lazy loading 대기)")
         else:
-            print("⚠️ YOLO 모델 로드 실패 (Mock 모드로 실행)")
-        
-        # ResNet 모델 로드
-        resnet_model = load_resnet_model()
-        if resnet_model:
-            print("✅ ResNet 모델 사전 로딩 완료")
-        else:
-            print("⚠️ ResNet 모델 로드 실패")
+            print("⚠️ 일부 AI 모델 파일 준비 실패 (AI 기능 제한됨)")
             
     except Exception as e:
-        print(f"⚠️ AI 모델 사전 로딩 중 오류: {e}")
+        print(f"⚠️ AI 모델 파일 검증 중 오류: {e}")
         print("   서버는 계속 실행되지만 AI 기능이 제한될 수 있습니다")
+        import traceback
+        traceback.print_exc()
     
     print("="*60)
     print("✅ 서버 시작 완료")
@@ -147,6 +176,56 @@ async def health_check():
         서버 상태
     """
     return {"status": "healthy", "service": "TTM Backend"}
+
+
+@app.get("/api/models/status", tags=["AI"])
+async def models_status():
+    """
+    AI 모델 파일 및 로딩 상태 확인
+    
+    Persistent Disk 마운트 및 모델 파일 존재 여부 확인
+    """
+    try:
+        from config.model_paths import (
+            YOLO_WEIGHTS, 
+            RESNET_WEIGHTS,
+            AI_MODELS_BASE
+        )
+        
+        # 모델 파일 존재 확인
+        yolo_exists = YOLO_WEIGHTS.exists()
+        resnet_exists = RESNET_WEIGHTS.exists()
+        
+        # 모델 로딩 상태 확인 (전역 캐시)
+        from services.nutrition_analyzer import _yolo_model, _resnet_model
+        
+        return {
+            "status": "ok",
+            "ai_models_base": str(AI_MODELS_BASE),
+            "models": {
+                "yolo": {
+                    "file_exists": yolo_exists,
+                    "file_path": str(YOLO_WEIGHTS),
+                    "file_size_mb": round(YOLO_WEIGHTS.stat().st_size / (1024*1024), 2) if yolo_exists else None,
+                    "loaded": _yolo_model is not None
+                },
+                "resnet": {
+                    "file_exists": resnet_exists,
+                    "file_path": str(RESNET_WEIGHTS),
+                    "file_size_mb": round(RESNET_WEIGHTS.stat().st_size / (1024*1024), 2) if resnet_exists else None,
+                    "loaded": _resnet_model is not None
+                }
+            },
+            "persistent_disk_mounted": AI_MODELS_BASE.exists()
+        }
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
+
 
 if __name__ == "__main__":
     uvicorn.run(

@@ -126,7 +126,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.purple[400]!, Colors.blue[400]!],
+            colors: [AppColors.primary, AppColors.primaryDark],
           ),
         ),
         child: SafeArea(
@@ -258,7 +258,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.purple[400]!, Colors.blue[400]!],
+                    colors: [AppColors.primary, AppColors.primaryDark],
                   ),
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -361,7 +361,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.purple[400]!, Colors.blue[400]!],
+                colors: [AppColors.primary, AppColors.primaryDark],
               ),
               borderRadius: BorderRadius.circular(16),
             ),
@@ -412,7 +412,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.auto_awesome, size: 16, color: Colors.purple[300]),
+              Icon(Icons.auto_awesome, size: 16, color: AppColors.primary),
               const SizedBox(width: 8),
               Text(
                 '추천 질문',
@@ -443,11 +443,11 @@ class _AICoachScreenState extends State<AICoachScreen> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.purple.withOpacity(0.1),
+                          color: AppColors.primary.withOpacity(0.2),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.purple.withOpacity(0.05),
+                            color: AppColors.primary.withOpacity(0.1),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -458,7 +458,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
                           Icon(
                             q['icon'] as IconData,
                             size: 16,
-                            color: Colors.purple[400],
+                            color: AppColors.primary,
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -527,7 +527,7 @@ class _AICoachScreenState extends State<AICoachScreen> {
             height: 48,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.purple[400]!, Colors.blue[400]!],
+                colors: [AppColors.primary, AppColors.primaryDark],
               ),
               shape: BoxShape.circle,
             ),

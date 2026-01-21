@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:ttm/constants/app_colors.dart';
 import '../services/meal_service.dart';
 import '../services/exercise_service.dart';
 import '../services/auth_service.dart';
@@ -72,7 +73,7 @@ class _StatsScreenState extends State<StatsScreen> {
             children: [
               const Icon(
                 Icons.auto_graph_rounded,
-                color: Colors.purple,
+                color: AppColors.primary,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -90,7 +91,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.purple.withOpacity(0.1),
+                  color: AppColors.primaryLight,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -98,7 +99,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Colors.purple,
+                    color: AppColors.primary,
                   ),
                 ),
               ),

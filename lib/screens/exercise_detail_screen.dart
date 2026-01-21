@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ttm/constants/app_colors.dart';
+import 'package:ttm/constants/app_colors.dart';
 
 /// 운동 기록 모델
 class WorkoutRecord {
