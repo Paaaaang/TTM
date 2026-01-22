@@ -354,7 +354,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Expanded(
                         child: _buildActivityCard(
-                          '🍽️',
+                          '',
                           _mealCount.toString(),
                           '식단',
                         ),
@@ -362,7 +362,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildActivityCard(
-                          '💪',
+                          '',
                           _workoutCount.toString(),
                           '운동',
                         ),
@@ -370,15 +370,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildActivityCard(
-                          '📝',
+                          '',
                           _postCount.toString(),
-                          '작성한 글',
+                          '글',
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildActivityCard(
-                          '❤️',
+                          '',
                           _likeCount.toString(),
                           '좋아요',
                         ),

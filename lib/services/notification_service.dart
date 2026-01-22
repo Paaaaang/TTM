@@ -19,7 +19,7 @@ class NotificationService {
   NotificationService._internal();
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _localNotifications = 
+  final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
   String? _fcmToken;
@@ -28,7 +28,7 @@ class NotificationService {
   /// Firebase 및 알림 초기화
   Future<void> initialize() async {
     // Firebase 초기화는 main.dart에서 이미 완료
-    
+
     // 백그라운드 메시지 핸들러 등록
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -63,7 +63,9 @@ class NotificationService {
 
   /// 로컬 알림 초기화
   Future<void> _initializeLocalNotifications() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -91,7 +93,8 @@ class NotificationService {
 
       await _localNotifications
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.createNotificationChannel(channel);
     }
   }
@@ -120,7 +123,7 @@ class NotificationService {
           await Future.delayed(const Duration(seconds: 2));
         }
       }
-      
+
       _fcmToken = await _firebaseMessaging.getToken();
       if (_fcmToken != null) {
         await _saveFCMToken(_fcmToken!);
@@ -196,7 +199,7 @@ class NotificationService {
   /// 알림 탭 처리 (FCM)
   void _handleNotificationTap(RemoteMessage message) {
     print('🔔 FCM 알림 탭: ${message.data}');
-    
+
     // 알림 타입에 따라 화면 이동
     final type = message.data['type'];
     final targetId = message.data['targetId'];
