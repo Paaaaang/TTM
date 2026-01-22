@@ -111,6 +111,16 @@ class NotificationService {
   /// FCM 토큰 가져오기
   Future<String?> _getFCMToken() async {
     try {
+      // iOS의 경우 APNS 토큰 먼저 가져오기
+      if (Platform.isIOS) {
+        final apnsToken = await _firebaseMessaging.getAPNSToken();
+        if (apnsToken == null) {
+          print('⏳ APNS 토큰 대기 중...');
+          // APNS 토큰이 준비될 때까지 대기
+          await Future.delayed(const Duration(seconds: 2));
+        }
+      }
+      
       _fcmToken = await _firebaseMessaging.getToken();
       if (_fcmToken != null) {
         await _saveFCMToken(_fcmToken!);
