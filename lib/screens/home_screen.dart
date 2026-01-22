@@ -162,6 +162,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       var status = await _iotService.getStatus(memberIdToTry);
+      print(
+        '📡 [IoT] Member $memberIdToTry - 연결: ${status.connected}, 마지막: ${status.lastSeen}',
+      );
       if (mounted) setState(() => _isRaspberryConnected = status.connected);
       try {
         final proc = await _iotService.getProcessingStatus(memberIdToTry);
@@ -1299,12 +1302,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   Row(
                     children: [
-                      Icon(
+                      SvgPicture.asset(
                         _isRaspberryConnected
-                            ? Icons.cloud_done_rounded
-                            : Icons.cloud_off_rounded,
-                        color: Colors.white,
-                        size: 20,
+                            ? 'icons_ui/cloud_done_rounded.svg'
+                            : 'icons_ui/cloud_off_rounded.svg',
+                        width: 20,
+                        height: 20,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       // debug text to show connection status
