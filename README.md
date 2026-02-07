@@ -4,7 +4,7 @@
 
 > Flutter + FastAPI + MySQL 기반 크로스 플랫폼 헬스케어 앱
 
-식단, 운동, 건강 정보를 통합 관리하는 종합 헬스케어 플랫폼
+식단, 운동, 건강 정보를 통합 관리하는 영양 관리 케어의 중심에 맞춘 종합 헬스케어 플랫폼
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)](https://flutter.dev)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)](https://fastapi.tiangolo.com)
@@ -12,6 +12,7 @@
 
 
 <img width="315" height="127" alt="Image" src="https://github.com/user-attachments/assets/7b3b5aff-3b54-4a41-872b-5f7ee021d40a" />
+[x]iOS 개발자용으로 배포 진행 완료
 
 ---
 
