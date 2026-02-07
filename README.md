@@ -10,7 +10,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)](https://fastapi.tiangolo.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)](https://www.mysql.com)
 
----
+
 <img width="315" height="127" alt="Image" src="https://github.com/user-attachments/assets/7b3b5aff-3b54-4a41-872b-5f7ee021d40a" />
 
 ---
