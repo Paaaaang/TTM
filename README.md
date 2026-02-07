@@ -13,37 +13,7 @@
 ---
 
 ## 시스템 아키텍처
-
-```mermaid
-graph TD
-    A[Flutter App] -->|HTTP/REST API| B[FastAPI Backend]
-    B -->|Query| C[MySQL Database]
-    B -->|AI Analysis| D[OpenAI API]
-    B -->|Image Storage| E[Local Storage]
-    A -->|FCM| F[Firebase Cloud Messaging]
-    A -->|Social Login| G[Google/Kakao OAuth]
-    B -->|Authentication| H[JWT Token]
-    
-    subgraph Frontend
-        A
-    end
-    
-    subgraph Backend Services
-        B
-        D
-        H
-    end
-    
-    subgraph Data Layer
-        C
-        E
-    end
-    
-    subgraph External Services
-        F
-        G
-    end
-```
+<img width="1190" height="638" alt="Image" src="https://github.com/user-attachments/assets/44bfcb79-fbe2-4640-9b66-54d659bc9e37" />
 
 ---
 
