@@ -12,6 +12,7 @@
 
 ---
 <img width="315" height="127" alt="Image" src="https://github.com/user-attachments/assets/7b3b5aff-3b54-4a41-872b-5f7ee021d40a" />
+
 ---
 
 ## 시스템 아키텍처
